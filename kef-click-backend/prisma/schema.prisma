@@ -1,0 +1,136 @@
+// =============================================================
+//  כיף Click — סכמת מסד הנתונים (Prisma + PostgreSQL)
+// =============================================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+/// תפקיד משתמש: מנהל מערכת או מנחה משחק
+enum Role {
+  ADMIN
+  HOST
+}
+
+/// סטטוס משחק
+enum GameStatus {
+  SETUP // הכנה — אפשר לערוך
+  LOBBY // לובי — משתתפים מתקשרים ומתחברים
+  RUNNING // המשחק רץ
+  PAUSED // מושהה
+  FINISHED // הסתיים — מוצג סיכום, אפשר לערוך ולשחק שוב
+}
+
+/// שלב בתוך משחק רץ
+enum GamePhase {
+  QUESTION // השאלה פתוחה לתשובות
+  REVEAL // חשיפה: תשובה נכונה / התפלגות
+}
+
+/// סוג שאלה
+enum QuestionType {
+  COMPETITIVE // תחרותית — תשובה נכונה וניקוד
+  POLL // סקר — בלי תשובה נכונה ובלי ניקוד
+}
+
+/// משתמשי המערכת (מנהלים ומנחים)
+model User {
+  id           Int      @id @default(autoincrement())
+  name         String   @db.VarChar(80)
+  email        String   @unique @db.VarChar(120)
+  passwordHash String
+  role         Role     @default(HOST)
+  isBlocked    Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  games Game[]
+}
+
+/// משחק של מנחה
+model Game {
+  id          Int        @id @default(autoincrement())
+  hostId      Int
+  title       String     @db.VarChar(100)
+  description String?    @db.VarChar(500)
+  status      GameStatus @default(SETUP)
+
+  // שדות שליטה למשחק רץ
+  currentQuestionIndex Int? // אינדקס (0..) של השאלה הנוכחית לפי הסדר
+  phase                GamePhase?
+  phaseStartedAt       DateTime? // מתי התחיל השלב הנוכחי (מוזז קדימה אחרי המשך מהשהיה)
+  pausedElapsedMs      Int? // כמה זמן עבר בשלב כשהמשחק הושהה
+  startedAt            DateTime?
+  finishedAt           DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  host         User          @relation(fields: [hostId], references: [id], onDelete: Cascade)
+  participants Participant[]
+  questions    Question[]
+
+  @@index([hostId])
+  @@index([status])
+}
+
+/// משתתף במשחק — מזוהה לפי מספר טלפון
+model Participant {
+  id          Int       @id @default(autoincrement())
+  gameId      Int
+  name        String    @db.VarChar(60)
+  phone       String    @db.VarChar(15) // נשמר בפורמט אחיד: ספרות בלבד, מתחיל ב-0
+  score       Int       @default(0)
+  connectedAt DateTime? // לא ריק = מחובר כרגע בטלפון
+  createdAt   DateTime  @default(now())
+
+  game    Game     @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  answers Answer[]
+
+  @@unique([gameId, phone])
+  @@index([phone])
+}
+
+/// שאלה במשחק — תמיד 4 תשובות (מקשים 1 עד 4)
+model Question {
+  id            Int          @id @default(autoincrement())
+  gameId        Int
+  order         Int // מיקום השאלה במשחק (1, 2, 3 ...)
+  type          QuestionType @default(COMPETITIVE)
+  text          String       @db.VarChar(300)
+  option1       String       @db.VarChar(120)
+  option2       String       @db.VarChar(120)
+  option3       String       @db.VarChar(120)
+  option4       String       @db.VarChar(120)
+  correctOption Int? // 1..4 בשאלה תחרותית, ריק בסקר
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
+  game    Game     @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  answers Answer[]
+
+  @@index([gameId, order])
+}
+
+/// תשובה של משתתף לשאלה — אחת בלבד לכל שאלה
+model Answer {
+  id            Int      @id @default(autoincrement())
+  participantId Int
+  questionId    Int
+  choice        Int // 1..4
+  responseMs    Int // כמה מילישניות עברו מפתיחת השאלה (בלי זמן השהיה)
+  isCorrect     Boolean? // ריק בשאלת סקר
+  points        Int      @default(0)
+  createdAt     DateTime @default(now())
+
+  participant Participant @relation(fields: [participantId], references: [id], onDelete: Cascade)
+  question    Question    @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  @@unique([participantId, questionId])
+  @@index([questionId, createdAt])
+}

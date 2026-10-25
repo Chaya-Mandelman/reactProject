@@ -1,0 +1,27 @@
+# הגדרות פריסה ל-Render (Blueprint)
+# מסד הנתונים נמצא אצל ספק נפרד (למשל Neon או Supabase) — ראי START-HERE.md
+services:
+  - type: web
+    name: kef-click-backend
+    runtime: node
+    plan: free
+    branch: main
+    buildCommand: npm install --include=dev && npm run build
+    # קודם מריצים את ה-Migrations על מסד הנתונים, ואז מפעילים את השרת
+    startCommand: npx prisma migrate deploy && node dist/server.js
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NODE_VERSION
+        value: "22"
+      - key: DATABASE_URL
+        sync: false # להדביק ידנית ב-Render (Connection String מספק מסד הנתונים)
+      - key: JWT_SECRET
+        generateValue: true # Render ייצור מפתח אקראי וחזק
+      - key: JWT_EXPIRES_IN
+        value: 8h
+      - key: CORS_ORIGIN
+        sync: false # כתובת אתר ה-React שלך, או * לבדיקות
+      - key: YEMOT_SECRET
+        generateValue: true
