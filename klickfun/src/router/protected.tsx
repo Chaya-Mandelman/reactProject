@@ -1,20 +1,15 @@
-import type { ReactNode } from "react"
+import { useContext, type ReactNode } from "react"
 import { Navigate, useLocation } from "react-router"
-import { useAuth } from "../context/user"
+import { AuthContext } from "../context/user";
+
 
 const Protected = ({ children, allow }: { children: ReactNode; allow: string }) => {
-    const location = useLocation()
-    const { user, isLoading } = useAuth()
+    const {user}=useContext(AuthContext)
 
-    if (isLoading) {
-        return <div>טוען...</div>
-    }
-    if (!user) {
-        return <Navigate to="/login" replace state={{ from: location }} />
-    }
-    if (user.role !== allow) {
-        return <Navigate to="/" replace />
-    }
+        if (user?.role !== allow) {
+            return <Navigate to="/" replace />
+        }
+    
     return <>{children}</>
 }
 

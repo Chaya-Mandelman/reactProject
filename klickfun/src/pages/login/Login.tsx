@@ -4,15 +4,15 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { loginScema } from "./schema"
 import type { LoginData } from "./schema"
 import { useLogin } from "../../hooks/users/useLogin"
-import { useNavigate } from "react-router"
-import { useAuth } from "../../context/user"
-import { Link } from "react-router"
+import { useNavigate,Link } from "react-router"
+import { useContext } from "react"
+import { AuthContext } from "../../context/user"
 import { getErrorMessage, setFieldErrors } from "../../function/getErrorMessage"
 
 
 export function Login() {
   const navigate = useNavigate()
-  const { login } = useAuth()
+  const { login } = useContext(AuthContext)
   const {
     register, handleSubmit, reset, setError, formState: { errors, isValid }, }
     = useForm<LoginData>({

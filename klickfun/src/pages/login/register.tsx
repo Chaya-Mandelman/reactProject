@@ -5,13 +5,13 @@ import { registerSchema } from "./schema"
 import type { RegisterData } from "./schema"
 import { useRegister } from "../../hooks/users/useRegister"
 import { Link, useNavigate } from "react-router"
-import { useAuth } from "../../context/user"
 import { getErrorMessage, setFieldErrors } from "../../function/getErrorMessage"
-
+import { AuthContext } from "../../context/user"
+import {useContext} from 'react'
 
 export function Register() {
   const navigate = useNavigate()
-  const { login } = useAuth()
+  const { login } = useContext(AuthContext)
   const {
     register, handleSubmit, reset, setError, formState: { errors, isValid }, }
     = useForm<RegisterData>({

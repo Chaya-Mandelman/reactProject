@@ -12,6 +12,7 @@ import GamesManagement from "../pages/admin/gamesManagement"
 import HostsManagement from "../pages/admin/hostsManagement"
 import { Login } from "../pages/login/Login"
 import Protected from "./protected"
+import { Header } from "../layouts/header"
 
 
 export const router = createBrowserRouter([
@@ -32,6 +33,7 @@ export const router = createBrowserRouter([
             },
             {
                 path: "games",
+                element:<Header/>,
                 children: [
                     {
                             index: true,
@@ -66,8 +68,10 @@ export const router = createBrowserRouter([
             },
             {
                 path: "admin",
+                element:<Header/>,
                 children: [
                     {
+                        index: true,
                         path: "games",
                         element: <Protected allow={"ADMIN"}><GamesManagement /></Protected>,
                     },
