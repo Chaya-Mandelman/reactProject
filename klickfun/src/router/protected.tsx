@@ -1,5 +1,5 @@
 import { useContext, type ReactNode } from "react"
-import { Navigate, useLocation } from "react-router"
+import { Navigate } from "react-router"
 import { AuthContext } from "../context/user";
 
 

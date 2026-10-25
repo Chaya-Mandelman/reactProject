@@ -7,7 +7,7 @@ import {
 } from "react"
 import type { ReactNode } from "react"
 import { getCurrentUserApi } from "../api/getCurrentUser"
-import { useNavigate } from "react-router"
+
 
 interface AuthContexType {
   user: AuthUser | null

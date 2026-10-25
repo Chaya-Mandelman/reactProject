@@ -45,3 +45,16 @@ export interface GameDetails {
   "questions": Question[],
   "participants": Participant[]
 }
+
+export interface CreateGame {
+  title: string
+  description?: string
+}
+
+export type GamesSort = "newest" | "oldest" | "title"
+
+export interface GamesFilters {
+  search?: string
+  status?: GameStatus
+  sort?: GamesSort
+}

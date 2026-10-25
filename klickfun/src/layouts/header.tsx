@@ -1,6 +1,6 @@
 import { useContext } from "react";
 import { AuthContext } from "../context/user";
-import { Link, Outlet, useNavigate } from "react-router";
+import {  Outlet, useNavigate } from "react-router";
 
 
 
