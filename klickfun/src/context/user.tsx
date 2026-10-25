@@ -6,6 +6,7 @@ import type { AuthUser } from "../types/login&register"
 type Auth = {
   user: AuthUser | null
   isLoading: boolean
+  setUser: (user: AuthUser | null) => void
   login: (user: AuthUser, token: string) => void
   logout: () => void
 }
@@ -40,7 +41,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     queryClient.setQueryData(ME, null)
   }
 
-  return <AuthContext.Provider value={{ user, isLoading, login, logout }}>{children}</AuthContext.Provider>
+  const setUser = (user: AuthUser | null) => {
+    user=user
+    queryClient.setQueryData(ME, user)
+  }
+  return <AuthContext.Provider value={{ user, isLoading, login, logout, setUser }}>{children}</AuthContext.Provider>
 }
 
 export const useAuth = () => {

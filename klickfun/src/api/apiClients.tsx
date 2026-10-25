@@ -15,3 +15,20 @@ api.interceptors.request.use(
   },
   (error) => Promise.reject(error),
 )
+
+// בהתחברות ובהרשמה 401 אומר סיסמה שגויה, לא Token שפג
+const AUTH_FORMS = ["/auth/login", "/auth/register"]
+
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    const isAuthForm = AUTH_FORMS.includes(error.config?.url ?? "")
+    if (error.response?.status === 401 && !isAuthForm) {
+      localStorage.removeItem("token")
+      if (window.location.pathname !== "/login") {
+        window.location.assign("/login")
+      }
+    }
+    return Promise.reject(error)
+  },
+)

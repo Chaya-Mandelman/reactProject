@@ -4,16 +4,16 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { registerSchema } from "./schema"
 import type { RegisterData } from "./schema"
 import { useRegister } from "../../hooks/users/useRegister"
-import axios from "axios"
-import { useNavigate } from "react-router"
+import { Link, useNavigate } from "react-router"
 import { useAuth } from "../../context/user"
+import { getErrorMessage, setFieldErrors } from "../../function/getErrorMessage"
 
 
 export function Register() {
   const navigate = useNavigate()
   const { login } = useAuth()
   const {
-    register, handleSubmit, reset, formState: { errors, isValid }, }
+    register, handleSubmit, reset, setError, formState: { errors, isValid }, }
     = useForm<RegisterData>({
       resolver: zodResolver(registerSchema),
       mode: "onChange",
@@ -33,6 +33,9 @@ export function Register() {
         console.log("Registration successful:", response)
         reset()
         navigate(response.user?.role === "HOST" ? "/games": "/admin" , { replace: true })
+      },
+      onError: (error) => {
+        setFieldErrors(error, setError, ["name", "email", "password"])
       },
     })
   }
@@ -57,10 +60,7 @@ export function Register() {
       </div>
       {registerMutation.isError && (
         <p role="alert" style={{ color: "red" }}>
-          {axios.isAxiosError(registerMutation.error)
-            ? registerMutation.error.response?.data?.message ||
-            "Registration failed"
-            : "Something went wrong"}
+          {getErrorMessage(registerMutation.error)}
         </p>
       )}
       <button
@@ -71,6 +71,9 @@ export function Register() {
           ? "Registering..."
           : "Register"}
       </button>
+      <p className="text-center text-sm text-muted">
+             יש לך חשבון? <Link to="/login" className="link">לכניסה</Link>
+            </p>
     </form>
   )
 }

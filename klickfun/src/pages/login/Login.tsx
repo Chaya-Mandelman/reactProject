@@ -3,19 +3,18 @@ import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { loginScema } from "./schema"
 import type { LoginData } from "./schema"
-import axios from "axios"
 import { useLogin } from "../../hooks/users/useLogin"
 import { useNavigate } from "react-router"
 import { useAuth } from "../../context/user"
-import type { ApiError } from "../../types/apiError"
-
+import { Link } from "react-router"
+import { getErrorMessage, setFieldErrors } from "../../function/getErrorMessage"
 
 
 export function Login() {
   const navigate = useNavigate()
   const { login } = useAuth()
   const {
-    register, handleSubmit, reset, formState: { errors, isValid }, }
+    register, handleSubmit, reset, setError, formState: { errors, isValid }, }
     = useForm<LoginData>({
       resolver: zodResolver(loginScema),
       mode: "onChange",
@@ -38,6 +37,9 @@ export function Login() {
         )
         reset()
       },
+      onError: (error) => {
+        setFieldErrors(error, setError, ["email", "password"])
+      },
     })
   }
   return (
@@ -54,7 +56,11 @@ export function Login() {
         <input type="password" id="password" {...register("password")} />
         {errors.password && <span>{errors.password.message}</span>}
       </div>
-      {loginMutation.isError && <p>{getErrorMessage()}</p>}
+      {loginMutation.isError && (
+        <p role="alert" style={{ color: "red" }}>
+          {getErrorMessage(loginMutation.error)}
+        </p>
+      )}
       <button
         type="submit"
         disabled={!isValid || loginMutation.isPending}
@@ -63,6 +69,10 @@ export function Login() {
           ? "Logging in..."
           : "Login"}
       </button>
+      
+            <p className="text-center text-sm text-muted">
+             אין לך חשבון? <Link to="/register" className="link">להרשמה</Link>
+            </p>
     </form>
   )
 }
