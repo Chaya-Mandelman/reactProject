@@ -6,12 +6,12 @@ import type { RegisterData } from "./schema"
 import { useRegister } from "../../hooks/users/useRegister"
 import axios from "axios"
 import { useNavigate } from "react-router"
-import { useAuthStore } from "../../store/authStore"
+import { useAuth } from "../../context/user"
 
 
 export function Register() {
   const navigate = useNavigate()
-  const setUser = useAuthStore((state) => state.setUser)
+  const { login } = useAuth()
   const {
     register, handleSubmit, reset, formState: { errors, isValid }, }
     = useForm<RegisterData>({
@@ -29,7 +29,7 @@ export function Register() {
   const onSubmit = (data: RegisterData) => {
     registerMutation.mutate(data, {
       onSuccess: (response) => {
-        setUser(response?.user)
+        login(response.user, response.token)
         console.log("Registration successful:", response)
         reset()
         navigate(response.user?.role === "HOST" ? "/games": "/admin" , { replace: true })

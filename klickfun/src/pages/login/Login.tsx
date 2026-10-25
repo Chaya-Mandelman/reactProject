@@ -6,14 +6,14 @@ import type { LoginData } from "./schema"
 import axios from "axios"
 import { useLogin } from "../../hooks/users/useLogin"
 import { useNavigate } from "react-router"
-import { useAuthStore } from "../../store/authStore"
+import { useAuth } from "../../context/user"
 import type { ApiError } from "../../types/apiError"
 
 
 
 export function Login() {
   const navigate = useNavigate()
-  const setUser = useAuthStore((state) => state.setUser)
+  const { login } = useAuth()
   const {
     register, handleSubmit, reset, formState: { errors, isValid }, }
     = useForm<LoginData>({
@@ -30,7 +30,7 @@ export function Login() {
   const onSubmit = (data: LoginData) => {
     loginMutation.mutate(data, {
       onSuccess: (response) => {
-        setUser(response?.user)
+        login(response.user, response.token)
         console.log("Login successful:", response)
         navigate(
           response.user?.role === "HOST" ?  "/games": "/admin",
@@ -54,17 +54,7 @@ export function Login() {
         <input type="password" id="password" {...register("password")} />
         {errors.password && <span>{errors.password.message}</span>}
       </div>
-      {loginMutation.isError && (
-        <p role="alert" style={{ color: "red" }}>
-          {axios.isAxiosError<ApiError>(loginMutation.error)
-            ? loginMutation.error.response?.data.error.details?.map((detail) => detail.message).join(", ") ||
-              loginMutation.error.response?.data.error.message ||
-              loginMutation.error.message
-            : loginMutation.error instanceof Error
-              ? loginMutation.error.message
-              : "Login failed"}
-        </p>
-      )}
+      {loginMutation.isError && <p>{getErrorMessage()}</p>}
       <button
         type="submit"
         disabled={!isValid || loginMutation.isPending}

@@ -1,7 +1,7 @@
-import { useAuthStore } from "../../store/authStore"
+import { useAuth } from "../../context/user"
 function MyGames() {
 
-  const user = useAuthStore((state) => state.user)
+  const { user } = useAuth()
   return (
     <>
       <div> {user?.name }שם:</div>
