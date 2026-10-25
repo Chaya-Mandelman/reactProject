@@ -1,44 +1,52 @@
-import { useState } from "react"
-import { type GamesFilters} from "../../../types/game"
-import { useMyGames } from "../../../hooks/games/usegetgames"
-import type { GameStatus } from "../../../types/game"   
+import { useEffect, useState } from "react"
+import type { GamesFilters, GamesSort, GameStatus } from "../../../types/game"
 
+type Props = {
+  filters: GamesFilters
+  onChange: (changes: GamesFilters) => void
+}
 
-export function SortGames({ filters, setFilters }: { filters: GamesFilters; setFilters: (filters: GamesFilters) => void }) {
-return(
+export function SortGames({ filters, onChange }: Props) {
+  const [search, setSearch] = useState(filters.search ?? "")
+
+  // שולחים לשרת רק אחרי שהמשתמשת הפסיקה להקליד
+  useEffect(() => {
+    const timer = setTimeout(() => onChange({ search: search.trim() || undefined }), 300)
+    return () => clearTimeout(timer)
+    // onChange נוצרת מחדש בכל רינדור; אם היא בתלויות, הטיימר ירוץ שוב ושוב
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [search])
+
+  return (
     <>
-     <select
-        value={filters.status ?? ""}
-        onChange={(e) =>
-          setFilters({ ...filters, status: (e.target.value || undefined) as GameStatus | undefined })
-        }
-      >
-        <option value="">כל הסטטוסים</option>
-        <option value="SETUP">מוגדר</option>
-        <option value="ACTIVE">פעיל</option>
-        <option value="COMPLETED">הושלם</option>
-        <option value="CANCELLED">בוטל</option>
-      </select>
       <div>
         <label htmlFor="game-title">חיפוש לפי שם המשחק:</label>
         <input
           id="game-title"
           type="text"
-          onChange={(e) => setFilters({ ...filters, search:(e.target.value || undefined) as string | undefined })}
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
         />
       </div>
       <select
-        value={filters.sort ?? ""}
-        onChange={(e) =>
-          setFilters({ ...filters, sort: (e.target.value || undefined) as "newest" | "oldest" | "title" | undefined })
-        }
+        value={filters.status ?? ""}
+        onChange={(e) => onChange({ status: (e.target.value || undefined) as GameStatus | undefined })}
       >
-        <option value="">ללא מיון</option>
-        <option value="newest">החדשים ביותר</option>
+        <option value="">כל הסטטוסים</option>
+        <option value="SETUP">בהכנה</option>
+        <option value="LOBBY">בהמתנה</option>
+        <option value="RUNNING">פעיל</option>
+        <option value="PAUSED">מושהה</option>
+        <option value="FINISHED">הסתיים</option>
+      </select>
+      <select
+        value={filters.sort ?? ""}
+        onChange={(e) => onChange({ sort: (e.target.value || undefined) as GamesSort | undefined })}
+      >
+        <option value="">החדשים ביותר</option>
         <option value="oldest">הישנים ביותר</option>
         <option value="title">לפי שם המשחק</option>
       </select>
-      
     </>
-)
+  )
 }

@@ -13,12 +13,12 @@ export const addGameApi = async (details: CreateGame): Promise<Game> => {
   return response.data.game
 }
 
-export const duplicateGameApi=async (id: string): Promise<Game> => {
-    const response = await api.post<{ game: Game }>(`/api/games/${id}/duplicate`)
+export const duplicateGameApi=async (id: number): Promise<Game> => {
+    const response = await api.post<{ game: Game }>(`/games/${id}/duplicate`)
     return response.data.game
 }
-    
-export const deleteGameApi = async (id: string): Promise<void> => {
+
+export const deleteGameApi = async (id: number): Promise<void> => {
   await api.delete(`/games/${id}`)
 }
 
