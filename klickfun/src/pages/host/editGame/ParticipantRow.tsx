@@ -14,7 +14,7 @@ export function ParticipantRow({ gameId, participant, locked }: Props) {
 
   if (editing) {
     return (
-      <li className="rounded-2xl bg-white/5 p-3">
+      <li className="col-span-full rounded-2xl bg-[#08051F]/40 p-3">
         <ParticipantForm
           defaultValues={{ name: participant.name, phone: participant.phone }}
           submitLabel="שמירה"
@@ -29,9 +29,9 @@ export function ParticipantRow({ gameId, participant, locked }: Props) {
   }
 
   return (
-    <li className="flex flex-wrap items-center gap-3 rounded-2xl border border-violet-400/30 bg-white/5 px-4 py-2.5 transition hover:border-cyan-400/60 hover:bg-white/10">
+    <li className="flex items-center gap-2 px-4 py-2.5 text-sm text-white/90 rounded-2xl border border-[#A855F7]/20 bg-[#21104D]/50 transition duration-200 hover:border-[#A855F7]/45 hover:bg-[#21104D]/80">
       {participant.name} · {participant.phone}
-      <button className="ms-auto cursor-pointer rounded-full font-bold transition duration-200 active:scale-95 disabled:cursor-not-allowed disabled:opacity-45 disabled:hover:scale-100 border-2 border-cyan-400/70 bg-cyan-400/5 px-5 py-2 text-cyan-100 shadow-[0_0_12px_rgba(34,211,238,0.35)] hover:bg-cyan-400/15 hover:shadow-[0_0_22px_rgba(34,211,238,0.6)]" onClick={() => setEditing(true)} disabled={locked}>עריכה</button>
+      <button className="ms-auto inline-flex cursor-pointer items-center justify-center gap-2 whitespace-nowrap rounded-full font-bold transition-all duration-200 ease-out active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#00E5FF] motion-reduce:transition-none motion-reduce:hover:translate-y-0 motion-reduce:active:scale-100 disabled:pointer-events-none disabled:opacity-40 h-8 px-3.5 text-xs border border-[#00E5FF]/30 bg-[#140A38]/80 text-[#C9BCEB] shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] hover:border-[#00E5FF]/70 hover:bg-[#00E5FF]/10 hover:text-white hover:shadow-[0_0_18px_-4px_rgba(0,229,255,0.6)]" onClick={() => setEditing(true)} disabled={locked}>עריכה</button>
       <DeleteButton
         confirmText={`למחוק את ${participant.name}?`}
         onConfirm={() => remove.mutate(ref)}

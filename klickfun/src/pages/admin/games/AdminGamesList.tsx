@@ -6,17 +6,17 @@ import { AdminGameRow } from "./AdminGameRow"
 export function AdminGamesList({ filters }: { filters: GamesAdminFilters }) {
   const { data: games, isLoading, error } = useAdminGames(filters)
 
-  if (isLoading) return <div className="mx-auto w-[calc(100%-2rem)] max-w-5xl my-16 animate-pulse text-center text-lg text-violet-200">טוען משחקים...</div>
+  if (isLoading) return <div className="mx-auto w-[calc(100%-2rem)] max-w-5xl my-20 animate-pulse text-center text-[#C9BCEB]">טוען משחקים...</div>
   // אין נתונים בכלל = הטעינה הראשונה נכשלה. רענון שנכשל משאיר את הרשימה האחרונה
-  if (!games) return <div className="mx-auto w-[calc(100%-2rem)] max-w-5xl my-4 rounded-xl border border-rose-400/60 bg-rose-500/15 px-4 py-2 font-semibold text-rose-200" role="alert">{getErrorMessage(error)}</div>
+  if (!games) return <div className="mx-auto w-[calc(100%-2rem)] max-w-5xl my-4 block rounded-2xl border border-rose-400/40 bg-rose-500/10 px-5 py-3 text-sm font-semibold text-rose-200 shadow-[0_0_24px_-8px_rgba(244,63,94,0.55)] backdrop-blur-md" role="alert">{getErrorMessage(error)}</div>
 
   return (
     <>
-      {error && <div className="mx-auto w-[calc(100%-2rem)] max-w-5xl my-4 rounded-xl border border-rose-400/60 bg-rose-500/15 px-4 py-2 font-semibold text-rose-200" role="alert">{getErrorMessage(error)}</div>}
+      {error && <div className="mx-auto w-[calc(100%-2rem)] max-w-5xl my-4 block rounded-2xl border border-rose-400/40 bg-rose-500/10 px-5 py-3 text-sm font-semibold text-rose-200 shadow-[0_0_24px_-8px_rgba(244,63,94,0.55)] backdrop-blur-md" role="alert">{getErrorMessage(error)}</div>}
       {games.length === 0 ? (
-        <div className="mx-auto w-[calc(100%-2rem)] max-w-5xl my-12 text-center text-lg text-violet-300/80">לא נמצאו משחקים</div>
+        <div className="mx-auto w-[calc(100%-2rem)] max-w-5xl my-16 rounded-3xl border border-dashed border-[#A855F7]/30 bg-[#140A38]/40 py-12 text-center text-[#C9BCEB]/75">לא נמצאו משחקים</div>
       ) : (
-        <ul className="mx-auto w-[calc(100%-2rem)] max-w-5xl my-6 grid gap-6 md:grid-cols-2">
+        <ul className="mx-auto w-[calc(100%-2rem)] max-w-5xl mt-6 mb-16 text-start grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {games.map((game) => (
             <AdminGameRow key={game.id} game={game} />
           ))}

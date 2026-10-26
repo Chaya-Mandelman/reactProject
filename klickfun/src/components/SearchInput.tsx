@@ -23,9 +23,9 @@ export function SearchInput({ label, value = "", onSearch }: Props) {
   }
 
   return (
-    <label className="mx-auto w-[calc(100%-2rem)] max-w-5xl my-3 flex flex-wrap items-center gap-3 font-semibold text-violet-200">
+    <label className="mx-1 my-2 inline-flex h-11 align-middle rounded-xl border border-[#A855F7]/25 bg-[#08051F]/60 text-sm text-white outline-none transition duration-200 hover:border-[#A855F7]/45 focus-within:border-[#00E5FF]/70 focus-within:ring-4 focus-within:ring-[#00E5FF]/15 w-[calc(100%-0.5rem)] max-w-sm items-center gap-2 ps-4 text-xs font-medium text-[#C9BCEB]/60">
       {label}
-      <input className="min-w-48 flex-1 rounded-xl border-2 border-violet-400/40 bg-indigo-950/70 px-4 py-2.5 text-white placeholder:text-violet-300/50 outline-none transition focus:border-cyan-400 focus:shadow-[0_0_16px_rgba(34,211,238,0.45)]" type="search" value={text} onChange={(e) => handleChange(e.target.value)} />
+      <input className="h-full min-w-0 flex-1 bg-transparent pe-4 text-sm text-white outline-none" type="search" value={text} onChange={(e) => handleChange(e.target.value)} />
     </label>
   )
 }

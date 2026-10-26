@@ -9,7 +9,7 @@ export function HostSelect({ value, onChange }: Props) {
   const { data: hosts = [] } = useHosts()
 
   return (
-    <select className="mx-auto w-[calc(100%-2rem)] max-w-5xl my-3 block cursor-pointer rounded-xl border-2 border-violet-400/40 bg-indigo-950/70 px-4 py-2.5 text-white placeholder:text-violet-300/50 outline-none transition focus:border-cyan-400 focus:shadow-[0_0_16px_rgba(34,211,238,0.45)] [&>option]:bg-indigo-950" value={value ?? ""} onChange={(e) => onChange(Number(e.target.value) || undefined)}>
+    <select className="mx-1 my-2 inline-flex h-11 align-middle rounded-xl border border-[#A855F7]/25 bg-[#08051F]/60 text-sm text-white outline-none transition duration-200 hover:border-[#A855F7]/45 focus-within:border-[#00E5FF]/70 focus-within:ring-4 focus-within:ring-[#00E5FF]/15 cursor-pointer px-4 focus:border-[#00E5FF]/70 [&>option]:bg-[#140A38]" value={value ?? ""} onChange={(e) => onChange(Number(e.target.value) || undefined)}>
       <option value="">כל המנחים</option>
       {hosts.map((host) => (
         <option key={host.id} value={host.id}>{host.name}</option>

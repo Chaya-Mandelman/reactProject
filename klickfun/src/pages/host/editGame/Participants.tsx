@@ -10,8 +10,8 @@ export function Participants({ game, locked }: { game: GameDetails; locked: bool
   const [formKey, setFormKey] = useState(0)
 
   return (
-    <section className="mx-auto w-[calc(100%-2rem)] max-w-5xl my-8 rounded-3xl border-2 border-fuchsia-400/50 bg-indigo-950/70 p-6 shadow-[0_0_30px_rgba(168,85,247,0.35),inset_0_0_30px_rgba(168,85,247,0.15)] backdrop-blur-md">
-      <h2 className="mb-5 text-2xl font-extrabold text-white drop-shadow-[0_0_10px_rgba(217,70,239,0.8)]">משתתפים ({game.participants.length})</h2>
+    <section className="mx-auto w-[calc(100%-2rem)] max-w-5xl my-6 block rounded-3xl border border-[#A855F7]/30 bg-linear-to-b from-[#21104D]/90 to-[#140A38]/90 p-5 sm:p-6 text-start shadow-[0_24px_60px_-24px_rgba(0,0,0,0.9),0_0_40px_-22px_rgba(168,85,247,0.7)] ring-1 ring-inset ring-white/5 backdrop-blur-xl">
+      <h2 className="mb-6 flex items-center gap-3 text-xl font-bold text-white before:h-6 before:w-1.5 before:rounded-full before:bg-linear-to-b before:from-[#F03CFF] before:to-[#00E5FF] before:shadow-[0_0_10px_rgba(240,60,255,0.7)]">משתתפים ({game.participants.length})</h2>
       {!locked && (
         <ParticipantForm
           key={formKey}
@@ -22,8 +22,8 @@ export function Participants({ game, locked }: { game: GameDetails; locked: bool
           }}
         />
       )}
-      {game.participants.length === 0 && <p className="my-4 text-violet-300/80">עדיין אין משתתפים</p>}
-      <ul className="mt-4 space-y-2">
+      {game.participants.length === 0 && <p className="mt-5 rounded-2xl border border-dashed border-[#A855F7]/30 bg-[#140A38]/40 py-8 text-center text-sm text-[#C9BCEB]/75">עדיין אין משתתפים</p>}
+      <ul className="mt-5 grid gap-2 sm:grid-cols-2">
         {game.participants.map((participant) => (
           <ParticipantRow key={participant.id} gameId={game.id} participant={participant} locked={locked} />
         ))}
