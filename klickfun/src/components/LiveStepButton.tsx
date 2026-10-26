@@ -16,10 +16,10 @@ export function LiveStepButton({ gameId, action, nextPage, label }: Props) {
 
   return (
     <>
-      <button onClick={run} disabled={isPending}>
+      <button className="cursor-pointer rounded-full font-bold transition duration-200 active:scale-95 disabled:cursor-not-allowed disabled:opacity-45 disabled:hover:scale-100 border-2 border-amber-200 bg-linear-to-b from-amber-300 to-amber-500 px-7 py-3 text-lg font-black text-indigo-950 shadow-[0_0_28px_rgba(251,191,36,0.6)] hover:scale-105 hover:shadow-[0_0_40px_rgba(251,191,36,0.9)]" onClick={run} disabled={isPending}>
         {isPending ? "טוען..." : label}
       </button>
-      {error !== null && <span role="alert">{getErrorMessage(error)}</span>}
+      {error !== null && <span className="text-sm font-semibold text-rose-300" role="alert">{getErrorMessage(error)}</span>}
     </>
   )
 }

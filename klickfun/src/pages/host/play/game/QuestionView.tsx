@@ -14,11 +14,11 @@ type Props = {
 export function QuestionView({ live, muted }: Props) {
   return (
     <div className={styles.layout}>
-      <section>
+      <section className="flex flex-col items-center gap-6">
         <QuestionHeader live={live} />
         <Timer ms={live.timeLeftMs} paused={live.paused} muted={muted} />
         <OptionsList options={live.question.options} />
-        <p>ענו {live.answeredCount} מתוך {live.connectedCount} מחוברים</p>
+        <p className="text-lg text-violet-200">ענו {live.answeredCount} מתוך {live.connectedCount} מחוברים</p>
         <AnswerPopups answers={live.recentAnswers} />
       </section>
       <FastestList fastest={live.fastest} />
