@@ -10,7 +10,7 @@ export function GameCard({ game }: { game: GameSummary }) {
       {game.description && <div>תיאור: {game.description}</div>}
       <div>כמות משתתפים: {game.participantsCount}</div>
       <div>כמות שאלות: {game.questionsCount}</div>
-      <GameLinks gameId={game.id} />
+      <GameLinks gameId={game.id} status={game.status} />
       <GameActions game={game} />
     </li>
   )
