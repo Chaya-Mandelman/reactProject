@@ -1,30 +1,21 @@
-import { Link, useNavigate } from "react-router"
+import { Link } from "react-router"
 import type { GameStatus } from "../../../types/game"
-import { useOpenLobby } from "../../../hooks/gameRun/useGameRunMutations"
-import { getErrorMessage } from "../../../utils/getErrorMessage"
+import { LiveStepButton } from "../../../components/LiveStepButton"
+import { openLobyApi } from "../../../api/gameRun"
 
 // משחק בסטטוסים האלה כבר פתוח בשרת — רק עוברים ללובי
 const OPEN_STATUSES: GameStatus[] = ["LOBBY", "RUNNING", "PAUSED"]
 
 export function GameLinks({ gameId, status }: { gameId: number, status: GameStatus }) {
-  const navigate = useNavigate()
-  const openLobby = useOpenLobby()
   const lobbyPath = `/play/${gameId}/lobby`
 
-  // פותחים לובי בשרת (הסטטוס הופך ל-LOBBY) ורק אז עוברים לדף הלובי
-  const handleStart = () => {
-    openLobby.mutate(gameId, { onSuccess: () => navigate(lobbyPath) })
-  }
-
+  // כפתור הפתיחה פותח לובי בשרת (הסטטוס הופך ל-LOBBY) ורק אז עובר לדף הלובי
   return (
     <nav>
       {OPEN_STATUSES.includes(status)
         ? <Link to={lobbyPath}>חזרה ללובי</Link>
-        : <button onClick={handleStart} disabled={openLobby.isPending}>
-            {openLobby.isPending ? "פותח לובי..." : "התחלת משחק"}
-          </button>}
+        : <LiveStepButton gameId={gameId} funcApi={openLobyApi} namePage="lobby" label="התחלת משחק" />}
       <Link to={`/games/edit/${gameId}`}>עריכת המשחק</Link>
-      {openLobby.isError && <p>{getErrorMessage(openLobby.error)}</p>}
     </nav>
   )
 }
