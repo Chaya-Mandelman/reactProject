@@ -8,7 +8,8 @@ import { getErrorDetails, getErrorMessage } from "../utils/getErrorMessage"
 export function useApiForm<T extends FieldValues>(
   schema: z.ZodType<T, T>,
   defaultValues: DefaultValues<T>,
-  onSubmit: (data: T) => Promise<unknown>,
+  onSubmit: (data: T) => Promise<unknown>|unknown,
+  
 ) {
   const [serverError, setServerError] = useState<string | null>(null)
   const form = useForm<T>({ resolver: zodResolver(schema), mode: "onChange", defaultValues })
