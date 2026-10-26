@@ -2,9 +2,9 @@ import {type LiveState} from '../types/liveState'
 import { api } from './apiClient'
 
 //פרטים על המשחק כל שניה
-export const liveApi=async (id:number):Promise<LiveState>=>{
-    const response=await api.get<LiveState>(`/games/${id}/live`)
-    return response.data
+export const liveApi = async (id: number): Promise<LiveState> => {
+    const response = await api.get<{ live: LiveState }>(`/games/${id}/live`)
+    return response.data.live
 }
 
 export const startGameApi=async (id:number):Promise<LiveState>=>{
