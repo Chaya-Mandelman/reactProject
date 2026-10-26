@@ -1,8 +1,8 @@
 import { z } from "zod"
 import { useWatch } from "react-hook-form"
-import { useApiForm } from "../../../hooks/useApiForm"
-import { FieldError } from "../../../components/FieldError"
-import type { OptionNumber, Question, QuestionInput } from "../../../types/question"
+import { useApiForm } from "@/hooks/useApiForm"
+import { FieldError } from "@/components/FieldError"
+import type { OptionNumber, Question, QuestionInput } from "@/types/question"
 
 const OPTIONS = [1, 2, 3, 4] as const
 const option = (n: number) => z.string().trim().min(1, `תשובה ${n} חובה`).max(120, `תשובה ${n} ארוכה מדי`)

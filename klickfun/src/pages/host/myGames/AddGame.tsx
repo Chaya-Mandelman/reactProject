@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router"
-import { useAddGame } from "../../../hooks/games/useGameMutations"
-import { GameForm } from "../../../components/GameForm"
+import { GameForm } from "@/components/GameForm"
+import { paths } from "@/constants/routes"
+import { useAddGame } from "@/hooks/games/useGameMutations"
 
 export function AddGame({ onClose }: { onClose: () => void }) {
   const addGame = useAddGame()
@@ -13,7 +14,7 @@ export function AddGame({ onClose }: { onClose: () => void }) {
       onCancel={onClose}
       onSubmit={async (data) => {
         const game = await addGame.mutateAsync(data)
-        navigate(`/games/edit/${game.id}`)
+        navigate(paths.editGame(game.id))
       }}
     />
   )

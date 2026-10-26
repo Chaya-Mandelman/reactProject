@@ -1,21 +1,24 @@
 import { Link } from "react-router"
-import type { GameStatus } from "../../../types/game"
-import { LiveStepButton } from "../../../components/LiveStepButton"
-import { openLobyApi } from "../../../api/gameRun"
+import { openLobbyApi } from "@/api/gameRun"
+import { LiveStepButton } from "@/components/LiveStepButton"
+import { isActiveStatus } from "@/constants/game"
+import { paths } from "@/constants/routes"
+import type { GameStatus } from "@/types/game"
 
-// משחק בסטטוסים האלה כבר פתוח בשרת — רק עוברים ללובי
-const OPEN_STATUSES: GameStatus[] = ["LOBBY", "RUNNING", "PAUSED"]
+type Props = {
+  gameId: number
+  status: GameStatus
+}
 
-export function GameLinks({ gameId, status }: { gameId: number, status: GameStatus }) {
-  const lobbyPath = `/play/${gameId}/lobby`
-
-  // כפתור הפתיחה פותח לובי בשרת (הסטטוס הופך ל-LOBBY) ורק אז עובר לדף הלובי
+export function GameLinks({ gameId, status }: Props) {
+  // משחק פעיל כבר פתוח בשרת, אז רק חוזרים אליו (ללובי או למסך המשחק).
+  // אחרת הכפתור פותח לובי בשרת (הסטטוס הופך ל-LOBBY) ורק אז עובר לדף הלובי
   return (
     <nav>
-      {OPEN_STATUSES.includes(status)
-        ? <Link to={lobbyPath}>חזרה ללובי</Link>
-        : <LiveStepButton gameId={gameId} funcApi={openLobyApi} namePage="lobby" label="התחלת משחק" />}
-      <Link to={`/games/edit/${gameId}`}>עריכת המשחק</Link>
+      {isActiveStatus(status)
+        ? <Link to={paths.play(gameId, status === "LOBBY" ? "lobby" : "game")}>חזרה למשחק</Link>
+        : <LiveStepButton gameId={gameId} action={openLobbyApi} nextPage="lobby" label="התחלת משחק" />}
+      <Link to={paths.editGame(gameId)}>עריכת המשחק</Link>
     </nav>
   )
 }

@@ -1,13 +1,15 @@
 import { z } from "zod"
-import { useApiForm } from "../../../hooks/useApiForm"
-import { FieldError } from "../../../components/FieldError"
-import type { ParticipantInput } from "../../../types/participant"
+import { useApiForm } from "@/hooks/useApiForm"
+import { FieldError } from "@/components/FieldError"
+import type { ParticipantInput } from "@/types/participant"
 
 // את תקינות הטלפון השרת בודק ומחזיר הודעה מדויקת
 const participantSchema = z.object({
   name: z.string().trim().min(2, "שם קצר מדי").max(60, "שם ארוך מדי"),
   phone: z.string().trim().min(1, "טלפון חובה"),
 })
+
+const EMPTY_PARTICIPANT: ParticipantInput = { name: "", phone: "" }
 
 type Props = {
   defaultValues?: ParticipantInput
@@ -17,7 +19,7 @@ type Props = {
 }
 
 // משמש גם להוספה וגם לעריכה
-export function ParticipantForm({ defaultValues = { name: "", phone: "" }, submitLabel, onSubmit, onCancel }: Props) {
+export function ParticipantForm({ defaultValues = EMPTY_PARTICIPANT, submitLabel, onSubmit, onCancel }: Props) {
   "use no memo" // React Compiler מסתיר את השגיאות של react-hook-form
   const { register, submit, serverError, formState: { errors, isSubmitting } } =
     useApiForm(participantSchema, defaultValues, onSubmit)

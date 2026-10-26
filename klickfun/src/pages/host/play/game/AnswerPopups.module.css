@@ -1,0 +1,24 @@
+.popups {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  min-height: 2.5rem;
+  padding: 0;
+  list-style: none;
+}
+
+/* שנייה אחת על המסך: נכנס, נשאר, ונעלם */
+.popup {
+  padding: 0.25rem 0.75rem;
+  border: 1px solid var(--accent-border);
+  border-radius: 999px;
+  background: var(--accent-bg);
+  animation: pop 1s ease-out forwards;
+}
+
+@keyframes pop {
+  0% { opacity: 0; transform: scale(0.8); }
+  15% { opacity: 1; transform: scale(1); }
+  80% { opacity: 1; }
+  100% { opacity: 0; }
+}

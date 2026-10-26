@@ -1,7 +1,7 @@
 import { z } from "zod"
-import { useApiForm } from "../hooks/useApiForm"
+import { useApiForm } from "@/hooks/useApiForm"
+import type { GameInput } from "@/types/game"
 import { FieldError } from "./FieldError"
-import type { CreateGame } from "../types/game"
 
 const gameSchema = z.object({
   title: z.string().trim().min(2, "שם המשחק קצר מדי").max(100, "שם המשחק ארוך מדי"),
@@ -9,9 +9,9 @@ const gameSchema = z.object({
 })
 
 type Props = {
-  defaultValues: CreateGame
+  defaultValues: GameInput
   submitLabel: string
-  onSubmit: (data: CreateGame) => Promise<unknown>
+  onSubmit: (data: GameInput) => Promise<unknown>
   onCancel?: () => void
   disabled?: boolean
 }

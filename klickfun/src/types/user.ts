@@ -1,9 +1,10 @@
+export type Role = "ADMIN" | "HOST"
 
-export default interface User {
-    "id": number,
-    "name": string,
-    "email": string,
-    "role": 'ADMIN' | 'HOST',
-    "isBlocked": boolean,
-    "createdAt": string
+export interface User {
+  id: number
+  name: string
+  email: string
+  role: Role
+  isBlocked: boolean
+  createdAt: string
 }

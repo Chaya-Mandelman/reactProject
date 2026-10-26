@@ -1,5 +1,5 @@
-import { addParticipantApi, deleteParticipantApi, updateParticipantApi } from "../../api/participants"
-import { useGameMutation } from "../games/useGameMutation"
+import { addParticipantApi, deleteParticipantApi, updateParticipantApi } from "@/api/participants"
+import { useGameMutation } from "@/hooks/games/useGameMutation"
 
 export const useAddParticipant = () => useGameMutation(addParticipantApi)
 export const useUpdateParticipant = () => useGameMutation(updateParticipantApi)

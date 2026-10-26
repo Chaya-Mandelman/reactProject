@@ -1,5 +1,5 @@
 import { api } from "./apiClient"
-import type { AuthResponse, AuthUser, LoginInput, RegisterInput } from "../types/auth"
+import type { AuthResponse, AuthUser, LoginInput, RegisterInput } from "@/types/auth"
 
 export const loginApi = async (data: LoginInput): Promise<AuthResponse> => {
   const response = await api.post<AuthResponse>("/auth/login", data)
@@ -11,7 +11,7 @@ export const registerApi = async (data: RegisterInput): Promise<AuthResponse> =>
   return response.data
 }
 
-export const getCurrentUserApi = async (): Promise<{ user: AuthUser }> => {
+export const getCurrentUserApi = async (): Promise<AuthUser> => {
   const response = await api.get<{ user: AuthUser }>("/auth/me")
-  return response.data
+  return response.data.user
 }

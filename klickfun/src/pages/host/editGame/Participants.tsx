@@ -1,6 +1,6 @@
 import { useState } from "react"
-import { useAddParticipant } from "../../../hooks/participants/useParticipantMutations"
-import type { GameDetails } from "../../../types/game"
+import { useAddParticipant } from "@/hooks/participants/useParticipantMutations"
+import type { GameDetails } from "@/types/game"
 import { ParticipantForm } from "./ParticipantForm"
 import { ParticipantRow } from "./ParticipantRow"
 

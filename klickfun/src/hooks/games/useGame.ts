@@ -1,10 +1,13 @@
 import { useQuery } from "@tanstack/react-query"
-import { getGameApi } from "../../api/games"
+import { getGameApi } from "@/api/games"
+import { queryKeys } from "@/api/queryKeys"
+import { useUserId } from "@/hooks/auth/useUserId"
 
-// ה-key מתחיל ב-"games", כך שכל invalidate של משחקים מרענן גם אותו
-export function useGame(id: number) {
+export function useGame(id: number, enabled = true) {
+  const userId = useUserId()
   return useQuery({
-    queryKey: ["games", id],
+    queryKey: queryKeys.game(userId, id),
     queryFn: () => getGameApi(id),
+    enabled,
   })
 }

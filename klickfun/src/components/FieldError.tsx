@@ -1,5 +1,5 @@
-import type { FieldError as Error } from "react-hook-form"
+import type { FieldError as FormFieldError } from "react-hook-form"
 
-export function FieldError({ error }: { error?: Error }) {
+export function FieldError({ error }: { error?: FormFieldError }) {
   return error ? <span role="alert">{error.message}</span> : null
 }

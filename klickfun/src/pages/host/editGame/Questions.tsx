@@ -1,6 +1,6 @@
-import { useAddQuestion } from "../../../hooks/questions/useQuestionMutations"
-import { OpenButton } from "../../../components/OpenButton"
-import type { GameDetails } from "../../../types/game"
+import { useAddQuestion } from "@/hooks/questions/useQuestionMutations"
+import { OpenButton } from "@/components/OpenButton"
+import type { GameDetails } from "@/types/game"
 import { QuestionForm } from "./QuestionForm"
 import { QuestionRow } from "./QuestionRow"
 

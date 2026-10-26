@@ -1,7 +1,7 @@
 import { useState } from "react"
-import { useDeleteParticipant, useUpdateParticipant } from "../../../hooks/participants/useParticipantMutations"
-import { DeleteButton } from "../../../components/DeleteButton"
-import type { Participant } from "../../../types/participant"
+import { useDeleteParticipant, useUpdateParticipant } from "@/hooks/participants/useParticipantMutations"
+import { DeleteButton } from "@/components/DeleteButton"
+import type { Participant } from "@/types/participant"
 import { ParticipantForm } from "./ParticipantForm"
 
 type Props = { gameId: number; participant: Participant; locked: boolean }

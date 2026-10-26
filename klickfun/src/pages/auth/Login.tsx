@@ -1,77 +1,35 @@
+import { Link, useNavigate } from "react-router"
+import { FieldError } from "@/components/FieldError"
+import { getHomePath, paths } from "@/constants/routes"
+import { useAuth } from "@/hooks/auth/useAuth"
+import { useLogin } from "@/hooks/auth/useLogin"
+import { useApiForm } from "@/hooks/useApiForm"
+import { loginSchema } from "./schema"
 
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { loginScema } from "./schema"
-import type { LoginData } from "./schema"
-import { useLogin } from "../../hooks/auth/useLogin"
-import { useNavigate,Link } from "react-router"
-import { useAuth } from "../../hooks/auth/useAuth"
-import { getErrorMessage, setFieldErrors } from "../../utils/getErrorMessage"
-
-
-export function Login() {
+function Login() {
+  "use no memo" // React Compiler מסתיר את השגיאות של react-hook-form
   const navigate = useNavigate()
   const { login } = useAuth()
-  const {
-    register, handleSubmit, reset, setError, formState: { errors, isValid }, }
-    = useForm<LoginData>({
-      resolver: zodResolver(loginScema),
-      mode: "onChange",
-      defaultValues: {
-        email: "",
-        password: "",
-      },
-    })
-
   const loginMutation = useLogin()
 
-  const onSubmit = (data: LoginData) => {
-    loginMutation.mutate(data, {
-      onSuccess: (response) => {
-        login(response.user, response.token)
-        console.log("Login successful:", response)
-        navigate(
-          response.user?.role === "HOST" ?  "/games": "/admin",
-          { replace: true }
-        )
-        reset()
-      },
-      onError: (error) => {
-        setFieldErrors(error, setError, ["email", "password"])
-      },
+  const { register, submit, serverError, formState: { errors, isSubmitting } } =
+    useApiForm(loginSchema, { email: "", password: "" }, async (data) => {
+      const { user, token } = await loginMutation.mutateAsync(data)
+      login(user, token)
+      navigate(getHomePath(user.role), { replace: true })
     })
-  }
+
   return (
-    <form
-      onSubmit={handleSubmit(onSubmit)}
-    >
-      <div>
-        <label htmlFor="email">Email:</label>
-        <input type="email" id="email" {...register("email")} />
-        {errors.email && <span>{errors.email.message}</span>}
-      </div>
-      <div>
-        <label htmlFor="password">Password:</label>
-        <input type="password" id="password" {...register("password")} />
-        {errors.password && <span>{errors.password.message}</span>}
-      </div>
-      {loginMutation.isError && (
-        <p role="alert" style={{ color: "red" }}>
-          {getErrorMessage(loginMutation.error)}
-        </p>
-      )}
-      <button
-        type="submit"
-        disabled={!isValid || loginMutation.isPending}
-      >
-        {loginMutation.isPending
-          ? "Logging in..."
-          : "Login"}
-      </button>
-      
-            <p className="text-center text-sm text-muted">
-             אין לך חשבון? <Link to="/register" className="link">להרשמה</Link>
-            </p>
+    <form onSubmit={submit}>
+      <fieldset disabled={isSubmitting}>
+        <label>אימייל: <input type="email" {...register("email")} /></label>
+        <FieldError error={errors.email} />
+        <label>סיסמה: <input type="password" {...register("password")} /></label>
+        <FieldError error={errors.password} />
+        {serverError && <p role="alert">{serverError}</p>}
+        <button type="submit">{isSubmitting ? "מתחבר..." : "כניסה"}</button>
+      </fieldset>
+      <p>אין לך חשבון? <Link to={paths.register}>להרשמה</Link></p>
     </form>
   )
 }

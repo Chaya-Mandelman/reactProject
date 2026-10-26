@@ -1,12 +1,13 @@
-import type { GameSummary } from "../../../types/game"
-import { GameLinks } from "./GameLinks"
+import { GAME_STATUS_LABELS } from "@/constants/game"
+import type { GameSummary } from "@/types/game"
 import { GameActions } from "./GameActions"
+import { GameLinks } from "./GameLinks"
 
 export function GameCard({ game }: { game: GameSummary }) {
   return (
     <li>
       <div>שם המשחק: {game.title}</div>
-      <div>מצב: {game.status}</div>
+      <div>מצב: {GAME_STATUS_LABELS[game.status]}</div>
       {game.description && <div>תיאור: {game.description}</div>}
       <div>כמות משתתפים: {game.participantsCount}</div>
       <div>כמות שאלות: {game.questionsCount}</div>

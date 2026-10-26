@@ -1,7 +1,8 @@
 import { useState } from "react"
-import { useDeleteQuestion, useUpdateQuestion } from "../../../hooks/questions/useQuestionMutations"
-import { DeleteButton } from "../../../components/DeleteButton"
-import type { Question } from "../../../types/question"
+import { useDeleteQuestion, useUpdateQuestion } from "@/hooks/questions/useQuestionMutations"
+import { DeleteButton } from "@/components/DeleteButton"
+import { QUESTION_TYPE_LABELS } from "@/constants/question"
+import type { Question } from "@/types/question"
 import { QuestionForm } from "./QuestionForm"
 
 type Props = { gameId: number; question: Question; locked: boolean }
@@ -31,7 +32,7 @@ export function QuestionRow({ gameId, question, locked }: Props) {
 
   return (
     <li>
-      <strong>{question.text}</strong> ({question.type === "POLL" ? "סקר" : "תחרותית"})
+      <strong>{question.text}</strong> ({QUESTION_TYPE_LABELS[question.type]})
       <ol>
         {options.map((text, i) => (
           <li key={i}>{text} {question.correctOption === i + 1 && "✓"}</li>

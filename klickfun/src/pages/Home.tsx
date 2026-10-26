@@ -1,20 +1,23 @@
 import { Link, Navigate } from "react-router"
-import { useAuth } from "../hooks/auth/useAuth"
+import { getHomePath, paths } from "@/constants/routes"
+import { useAuth } from "@/hooks/auth/useAuth"
+import { getErrorMessage } from "@/utils/getErrorMessage"
 
 function Home() {
-    const { user, isLoading } = useAuth()
+  const { user, isLoading, error } = useAuth()
 
-    // משתמש מחובר עובר ישר לדף של התפקיד שלו
-    if (isLoading) return <div>טוען...</div>
-    if (user) return <Navigate to={user.role === "HOST" ? "/games" : "/admin/games"} replace />
+  // משתמש מחובר עובר ישר לדף של התפקיד שלו
+  if (isLoading) return <div>טוען...</div>
+  if (error) return <div role="alert">{getErrorMessage(error)}</div>
+  if (user) return <Navigate to={getHomePath(user.role)} replace />
 
-    return (
-        <>
-            <div>Home</div>
-            <Link to="/login">כניסה</Link>
-            <Link to="/register">הרשמה</Link>
-        </>
-    )
+  return (
+    <>
+      <h1>כיף Click</h1>
+      <Link to={paths.login}>כניסה</Link>
+      <Link to={paths.register}>הרשמה</Link>
+    </>
+  )
 }
 
 export default Home

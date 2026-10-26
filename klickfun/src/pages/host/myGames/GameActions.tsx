@@ -1,7 +1,7 @@
-import { useDeleteGame, useDuplicateGame } from "../../../hooks/games/useGameMutations"
-import { getErrorMessage } from "../../../utils/getErrorMessage"
-import { DeleteButton } from "../../../components/DeleteButton"
-import type { GameSummary } from "../../../types/game"
+import { useDeleteGame, useDuplicateGame } from "@/hooks/games/useGameMutations"
+import { getErrorMessage } from "@/utils/getErrorMessage"
+import { DeleteButton } from "@/components/DeleteButton"
+import type { GameSummary } from "@/types/game"
 
 // לכל משחק יש mutation משלו, ולכן isPending ו-error שייכים רק לשורה הזו
 export function GameActions({ game }: { game: GameSummary }) {

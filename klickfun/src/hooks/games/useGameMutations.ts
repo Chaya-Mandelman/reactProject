@@ -1,4 +1,4 @@
-import { addGameApi, deleteGameApi, duplicateGameApi, updateGameApi } from "../../api/games"
+import { addGameApi, deleteGameApi, duplicateGameApi, updateGameApi } from "@/api/games"
 import { useGameMutation } from "./useGameMutation"
 
 export const useAddGame = () => useGameMutation(addGameApi)

@@ -1,10 +1,10 @@
-import { getErrorMessage } from "../utils/getErrorMessage"
+import { getErrorMessage } from "@/utils/getErrorMessage"
 
 type Props = {
   confirmText: string
   onConfirm: () => void
   isPending: boolean
-  error: unknown
+  error: Error | null
   disabled?: boolean
 }
 
@@ -15,7 +15,7 @@ export function DeleteButton({ confirmText, onConfirm, isPending, error, disable
       <button onClick={() => confirm(confirmText) && onConfirm()} disabled={disabled || isPending}>
         {isPending ? "מוחק..." : "מחיקה"}
       </button>
-      {error != null && <span role="alert">{getErrorMessage(error)}</span>}
+      {error !== null && <span role="alert">{getErrorMessage(error)}</span>}
     </>
   )
 }

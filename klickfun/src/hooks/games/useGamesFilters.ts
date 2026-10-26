@@ -1,25 +1,14 @@
-import { useSearchParams } from "react-router"
-import type { GamesFilters, GamesSort, GameStatus } from "../../types/game"
+import { GAME_STATUS_LABELS, GAMES_SORT_LABELS } from "@/constants/game"
+import { pick, useUrlFilters } from "@/hooks/useUrlFilters"
+import type { GamesFilters, GamesSort, GameStatus } from "@/types/game"
 
-// הפילטרים נשמרים בכתובת, כך שהם נשארים אחרי רענון או חזרה מדף אחר
 export function useGamesFilters() {
-  const [searchParams, setSearchParams] = useSearchParams()
+  const { searchParams, updateFilters } = useUrlFilters<GamesFilters>()
 
   const filters: GamesFilters = {
     search: searchParams.get("search") ?? undefined,
-    status: (searchParams.get("status") as GameStatus | null) ?? undefined,
-    sort: (searchParams.get("sort") as GamesSort | null) ?? undefined,
-  }
-
-  const updateFilters = (changes: GamesFilters) => {
-    setSearchParams((prev) => {
-      const next = new URLSearchParams(prev)
-      for (const [key, value] of Object.entries(changes)) {
-        if (value) next.set(key, value)
-        else next.delete(key)
-      }
-      return next
-    }, { replace: true })
+    status: pick<GameStatus>(searchParams.get("status"), GAME_STATUS_LABELS),
+    sort: pick<GamesSort>(searchParams.get("sort"), GAMES_SORT_LABELS),
   }
 
   return { filters, updateFilters }
