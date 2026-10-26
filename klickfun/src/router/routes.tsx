@@ -1,94 +1,56 @@
+import { createBrowserRouter, Navigate, Outlet } from "react-router"
+import Home from "../pages/Home"
+import Login from "../pages/auth/Login"
+import Register from "../pages/auth/Register"
+import MyGames from "../pages/host/myGames/MyGames"
+import EditGame from "../pages/host/editGame/EditGame"
+import Lobby from "../pages/host/play/Lobby"
+import Question from "../pages/host/play/Question"
+import Reveal from "../pages/host/play/Reveal"
+import Summary from "../pages/host/play/Summary"
+import GamesManagement from "../pages/admin/GamesManagement"
+import HostsManagement from "../pages/admin/HostsManagement"
+import { AppLayout } from "../layouts/AppLayout"
+import Protected from "./Protected"
 
-import { createBrowserRouter, Navigate } from "react-router"
-import Register from "../pages/login/register"
-import Home from "../pages/home"
-import EditGame from "../pages/user/editGame"
-import Lobby from "../pages/user/lobby"
-import MyGames from "../pages/user/myGames/myGames"
-import Question from "../pages/user/question"
-import Reveal from "../pages/user/reveal"
-import Summary from "../pages/user/summary"
-import GamesManagement from "../pages/admin/gamesManagement"
-import HostsManagement from "../pages/admin/hostsManagement"
-import { Login } from "../pages/login/Login"
-import Protected from "./protected"
-import { Header } from "../layouts/header"
-
-
+// Protected עוטף כל הורה פעם אחת, וכל הדפים שבתוכו מוגנים
 export const router = createBrowserRouter([
     {
         path: "/",
         children: [
-            {
-                index: true,
-                element:<Home /> 
-            },
-            {
-                path: "login",
-                element: <Login />,
-            },
-            {
-                path: "register",
-                element: <Register />,
-            },
+            { index: true, element: <Home /> },
+            { path: "login", element: <Login /> },
+            { path: "register", element: <Register /> },
             {
                 path: "games",
-                element:<Header/>,
+                element: <Protected allow="HOST"><AppLayout /></Protected>,
                 children: [
-                    {
-                            index: true,
-                            element: <Protected allow={"HOST"}><MyGames /></Protected>,
-                    },
-                    {
-                        path: "edit/:gameId",
-                        element: <Protected allow={"HOST"}><EditGame /></Protected>,
-                    },
+                    { index: true, element: <MyGames /> },
+                    { path: "edit/:gameId", element: <EditGame /> },
                 ],
             },
             {
                 path: "play/:gameId",
+                element: <Protected allow="HOST"><Outlet /></Protected>,
                 children: [
-                    {
-                        path: "lobby",
-                        element: <Protected allow={"HOST"}><Lobby /></Protected>,
-                    },
-                    {
-                        path: "question",
-                        element: <Protected allow={"HOST"}><Question /></Protected>,
-                    },
-                    {
-                        path: "reveal",
-                        element: <Protected allow={"HOST"}><Reveal /></Protected>,
-                    },
-                    {
-                        path: "summary",
-                        element: <Protected allow={"HOST"}><Summary /></Protected>,
-                    },
-                ]
+                    { path: "lobby", element: <Lobby /> },
+                    { path: "question", element: <Question /> },
+                    { path: "reveal", element: <Reveal /> },
+                    { path: "summary", element: <Summary /> },
+                ],
             },
             {
                 path: "admin",
-                element:<Header/>,
+                element: <Protected allow="ADMIN"><AppLayout /></Protected>,
                 children: [
-                    {
-                        index: true,
-                        path: "games",
-                        element: <Protected allow={"ADMIN"}><GamesManagement /></Protected>,
-                    },
-                    {
-                        path: "hosts",
-                        element: <Protected allow={"ADMIN"}><HostsManagement /></Protected>,
-                    }
-
-                ]
-
-            }
-
+                    { index: true, path: "games", element: <GamesManagement /> },
+                    { path: "hosts", element: <HostsManagement /> },
+                ],
+            },
         ],
     },
     {
         path: "*",
         element: <Navigate to="/" replace />,
     },
-],
-)
+])
