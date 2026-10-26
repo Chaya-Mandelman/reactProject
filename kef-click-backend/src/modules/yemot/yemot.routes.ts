@@ -38,8 +38,14 @@ async function handle(req: Request, res: Response) {
   const receivedAt = new Date(); // הזמן נלקח מיד כשהבקשה הגיעה
   const params = { ...req.query, ...(typeof req.body === 'object' && req.body ? req.body : {}) } as Record<string, unknown>;
   const key = Array.isArray(params.key) ? String(params.key[0]) : String(params.key ?? '');
+  const keyOk = safeEqual(key, env.YEMOT_SECRET);
 
-  if (!safeEqual(key, env.YEMOT_SECRET)) {
+  // לוג לכל פנייה — בלי ערך המפתח עצמו
+  const { key: _omit, ...logged } = params;
+  // eslint-disable-next-line no-console
+  console.log(`[yemot] ${req.method} keyOk=${keyOk}`, JSON.stringify(logged));
+
+  if (!keyOk) {
     res.status(403).type('text/plain; charset=utf-8').send('forbidden');
     return;
   }
