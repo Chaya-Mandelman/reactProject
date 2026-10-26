@@ -5,7 +5,7 @@ services:
     name: kef-click-backend
     runtime: node
     plan: free
-    branch: main
+    branch: master
     buildCommand: npm install --include=dev && npm run build
     # קודם מריצים את ה-Migrations על מסד הנתונים, ואז מפעילים את השרת
     startCommand: npx prisma migrate deploy && node dist/server.js
