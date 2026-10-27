@@ -21,7 +21,7 @@ function Register() {
 
   return (
     <main className="flex min-h-svh items-center justify-center px-4 py-10">
-      <form className="card w-full max-w-md px-9 py-10 before:mb-8 before:block before:bg-linear-to-b before:from-[#fff3c4] before:to-gold before:bg-clip-text before:text-center before:text-5xl before:font-black before:text-transparent before:content-['כיף_Click']" onSubmit={submit}>
+      <form className="card w-full max-w-md px-9 py-10 before:mb-8 before:block before:bg-linear-to-b before:from-[#fff3c4] before:to-gold before:bg-clip-text before:text-center before:text-5xl before:font-black before:text-transparent before:content-['clickfun']" onSubmit={submit}>
         <fieldset className="flex flex-col gap-4" disabled={isSubmitting}>
           <label className="field">שם: <input className="input" {...register("name")} /></label>
           <FieldError error={errors.name} />

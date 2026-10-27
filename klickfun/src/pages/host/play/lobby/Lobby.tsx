@@ -7,6 +7,9 @@ import { useGameId } from "@/hooks/useGameId"
 import { getErrorMessage } from "@/utils/getErrorMessage"
 import { Connected } from "./Connected"
 
+// המספר שהמשתתפים מחייגים אליו כדי להצטרף למשחק
+const DIAL_IN_PHONE = "077-2271841"
+
 function Lobby() {
   const { gameId, isValid } = useGameId()
   const { data: live, isPending, error } = useLive(gameId, isValid)
@@ -23,6 +26,9 @@ function Lobby() {
   return (
     <main className="stage-full mx-auto flex min-h-svh w-full max-w-5xl flex-col items-center px-4 pt-14 pb-48 text-center sm:px-6">
       <h1 className="gold-text text-4xl tracking-tight break-words sm:text-6xl">{live.game.title} · לובי</h1>
+      <div className="chip chip-gold mt-6 gap-3 px-6 py-2.5 text-lg">
+        מספר להתחברות: <span className="text-2xl font-black tracking-wide text-white tabular-nums" dir="ltr">{DIAL_IN_PHONE}</span>
+      </div>
       {error && <p className="alert mt-6 w-full" role="alert">{getErrorMessage(error)}</p>}
       <Connected live={live} />
       {/* אפשר להתחיל רק משחק שהלובי שלו פתוח בשרת */}
