@@ -23,7 +23,7 @@ export function SearchInput({ label, value = "", onSearch }: Props) {
   }
 
   return (
-    <label className="mx-1 my-2 inline-flex h-11 align-middle rounded-xl border border-[#A855F7]/25 bg-[#08051F]/60 text-sm text-white outline-none transition duration-200 hover:border-[#A855F7]/45 focus-within:border-[#00E5FF]/70 focus-within:ring-4 focus-within:ring-[#00E5FF]/15 w-[calc(100%-0.5rem)] max-w-sm items-center gap-2 ps-4 text-xs font-medium text-[#C9BCEB]/60">
+    <label className="flex h-11 w-full items-center gap-2 rounded-xl border border-white/10 bg-bg/70 ps-4 text-xs font-medium whitespace-nowrap text-muted/70 transition duration-200 hover:border-white/20 focus-within:border-cyan/60 focus-within:ring-4 focus-within:ring-cyan/10 sm:max-w-sm">
       {label}
       <input className="h-full min-w-0 flex-1 bg-transparent pe-4 text-sm text-white outline-none" type="search" value={text} onChange={(e) => handleChange(e.target.value)} />
     </label>

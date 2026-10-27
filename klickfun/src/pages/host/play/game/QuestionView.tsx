@@ -4,21 +4,23 @@ import { FastestList } from "./FastestList"
 import { OptionsList } from "./OptionsList"
 import { QuestionHeader } from "./QuestionHeader"
 import { Timer } from "./Timer"
-import styles from "./QuestionView.module.css"
 
 type Props = {
   live: LiveQuestionState
   muted: boolean
 }
 
+// הטיימר בפאנל אחד, השאלה במרכז, והמהירים בפאנל השני
 export function QuestionView({ live, muted }: Props) {
   return (
-    <div className={styles.layout}>
-      <section className="flex flex-col items-center gap-8">
-        <QuestionHeader live={live} />
+    <div className="grid items-start gap-8 xl:grid-cols-[14rem_1fr_14rem]">
+      <aside className="card flex flex-wrap items-center justify-center gap-5 px-5 py-6 xl:flex-col xl:py-7">
         <Timer ms={live.timeLeftMs} paused={live.paused} muted={muted} />
+        <p className="chip chip-cyan px-4 py-1.5 text-sm tabular-nums">ענו {live.answeredCount} מתוך {live.connectedCount} מחוברים</p>
+      </aside>
+      <section className="flex flex-col items-center gap-10 pt-4">
+        <QuestionHeader live={live} />
         <OptionsList options={live.question.options} />
-        <p className="rounded-full border border-[#00E5FF]/30 bg-[#140A38]/80 px-5 py-2 text-sm font-semibold tabular-nums text-[#C9BCEB] shadow-[0_0_18px_-6px_rgba(0,229,255,0.6)] backdrop-blur-md">ענו {live.answeredCount} מתוך {live.connectedCount} מחוברים</p>
         <AnswerPopups answers={live.recentAnswers} />
       </section>
       <FastestList fastest={live.fastest} />

@@ -22,7 +22,7 @@ export function GamesFilterBar({ filters, onChange }: Props) {
         onChange={(status) => onChange({ status })}
       />
       {/* מיון ברירת המחדל לא נשמר בכתובת */}
-      <select className="mx-1 my-2 inline-flex h-11 align-middle rounded-xl border border-[#A855F7]/25 bg-[#08051F]/60 text-sm text-white outline-none transition duration-200 hover:border-[#A855F7]/45 focus-within:border-[#00E5FF]/70 focus-within:ring-4 focus-within:ring-[#00E5FF]/15 cursor-pointer px-4 focus:border-[#00E5FF]/70 [&>option]:bg-[#140A38]"
+      <select className="select"
         value={filters.sort ?? DEFAULT_SORT}
         onChange={(e) => {
           const sort = e.target.value as GamesSort

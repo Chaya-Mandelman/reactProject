@@ -10,7 +10,7 @@ export function RevealView({ live }: { live: LiveRevealState }) {
   const { question, reveal } = live
 
   return (
-    <section className="flex flex-col items-center gap-8">
+    <section className="mx-auto flex max-w-5xl flex-col items-center gap-10 pt-4">
       <QuestionHeader live={live} />
       {question.type === "POLL" ? (
         <Distribution options={question.options} counts={reveal.distribution} />
@@ -21,7 +21,7 @@ export function RevealView({ live }: { live: LiveRevealState }) {
         </>
       )}
       {live.revealLeftMs !== null && (
-        <p className="animate-pulse text-sm font-semibold text-[#7DF3FF]">
+        <p className="chip chip-cyan px-5 py-2 text-sm tabular-nums">
           {live.isLastQuestion ? "הסיכום" : "השאלה הבאה"} בעוד {toSecondsLeft(live.revealLeftMs)} שניות
         </p>
       )}

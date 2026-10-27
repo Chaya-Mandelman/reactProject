@@ -6,7 +6,9 @@ export function AppLayout() {
   return (
     <>
       <Header />
-      <Outlet />
+      <main className="mx-auto w-full max-w-6xl px-4 pb-20 sm:px-6">
+        <Outlet />
+      </main>
     </>
   )
 }

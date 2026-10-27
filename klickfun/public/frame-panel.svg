@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="120" height="120" viewBox="0 0 120 120">
+<defs><linearGradient id="gold" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFF4C2"/><stop offset=".35" stop-color="#F7C948"/><stop offset=".65" stop-color="#B8860B"/><stop offset="1" stop-color="#F7D774"/></linearGradient><linearGradient id="navy" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0B2457"/><stop offset=".5" stop-color="#061536"/><stop offset="1" stop-color="#0A1F4D"/></linearGradient></defs>
+<polygon points="14,3 106,3 117,14 117,106 106,117 14,117 3,106 3,14" fill="#030A1F" stroke="url(#gold)" stroke-width="3" stroke-linejoin="round"/>
+<polygon points="18,9 102,9 111,18 111,102 102,111 18,111 9,102 9,18" fill="url(#navy)" stroke="#3FD0FF" stroke-opacity=".55" stroke-width="1.2"/>
+<path d="M44 17h32M44 103h32" stroke="url(#gold)" stroke-width="1.5"/>
+<circle cx="40" cy="17" r="2" fill="#F7C948"/><circle cx="80" cy="17" r="2" fill="#F7C948"/>
+<circle cx="40" cy="103" r="2" fill="#F7C948"/><circle cx="80" cy="103" r="2" fill="#F7C948"/>
+</svg>

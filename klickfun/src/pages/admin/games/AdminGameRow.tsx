@@ -9,17 +9,21 @@ export function AdminGameRow({ game }: { game: GameSummary }) {
   const deleteGame = useDeleteGame()
 
   return (
-    <li className="rounded-3xl border border-[#A855F7]/30 bg-linear-to-b from-[#21104D]/90 to-[#140A38]/90 p-5 sm:p-6 text-start shadow-[0_24px_60px_-24px_rgba(0,0,0,0.9),0_0_40px_-22px_rgba(168,85,247,0.7)] ring-1 ring-inset ring-white/5 backdrop-blur-xl group relative flex flex-wrap content-start items-center gap-2 overflow-hidden transition duration-300 hover:-translate-y-1 hover:border-[#F03CFF]/40 hover:shadow-[0_24px_50px_-18px_rgba(240,60,255,0.6)] before:absolute before:inset-x-0 before:top-0 before:h-1 before:bg-linear-to-l before:from-[#F03CFF] before:via-[#00E5FF] before:to-[#FFCA28] before:shadow-[0_0_14px_rgba(0,229,255,0.8)]">
-      <div className="mb-1 w-full text-lg font-bold leading-snug text-white">{game.title} · {GAME_STATUS_LABELS[game.status]}</div>
-      <div className="rounded-full px-3 py-1 text-xs font-semibold ring-1 ring-inset bg-[#F03CFF]/10 text-[#F9A8FF] ring-[#F03CFF]/35">מנחה: {game.host.name}</div>
-      <div className="rounded-full px-3 py-1 text-xs font-semibold ring-1 ring-inset bg-[#140A38]/80 text-[#C9BCEB] ring-[#A855F7]/25">שאלות: {game.questionsCount} · משתתפים: {game.participantsCount}</div>
-      <OpenButton label="צפייה">{(close) => <GameDetailsView gameId={game.id} onClose={close} />}</OpenButton>
-      <DeleteButton
-        confirmText={`למחוק את "${game.title}" של ${game.host.name}?`}
-        onConfirm={() => deleteGame.mutate(game.id)}
-        isPending={deleteGame.isPending}
-        error={deleteGame.error}
-      />
+    <li className="card flex flex-col items-center gap-4 text-center transition duration-200 hover:-translate-y-1 motion-reduce:hover:translate-y-0">
+      <div className="text-lg leading-snug font-bold break-words text-white">{game.title} · {GAME_STATUS_LABELS[game.status]}</div>
+      <div className="flex flex-wrap justify-center gap-2">
+        <div className="chip chip-gold">מנחה: {game.host.name}</div>
+        <div className="chip">שאלות: {game.questionsCount} · משתתפים: {game.participantsCount}</div>
+      </div>
+      <div className="mt-auto flex w-full flex-wrap items-center justify-center gap-2 border-t border-white/10 pt-4">
+        <OpenButton label="צפייה">{(close) => <GameDetailsView gameId={game.id} onClose={close} />}</OpenButton>
+        <DeleteButton
+          confirmText={`למחוק את "${game.title}" של ${game.host.name}?`}
+          onConfirm={() => deleteGame.mutate(game.id)}
+          isPending={deleteGame.isPending}
+          error={deleteGame.error}
+        />
+      </div>
     </li>
   )
 }
