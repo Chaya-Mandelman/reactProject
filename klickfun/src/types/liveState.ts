@@ -70,7 +70,6 @@ interface LiveRoundBase extends LiveBase {
   questionNumber: number
   question: LiveQuestion
   timeLeftMs: number
-  revealLeftMs: number | null
   isLastQuestion: boolean
   answeredCount: number
   lastAnswerId: number | null
