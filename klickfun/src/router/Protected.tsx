@@ -13,7 +13,6 @@ type Props = {
 export function Protected({ allow, children }: Props) {
   const { user, isLoading, error } = useAuth()
 
-  // אחרי רענון המשתמש עוד לא נטען מ-/auth/me, אז מחכים לפני שמחליטים
   if (isLoading) return <div className="status">טוען...</div>
   if (error) return <div className="alert mx-4 mt-10 sm:mx-auto sm:max-w-xl" role="alert">{getErrorMessage(error)}</div>
   if (!user) return <Navigate to={paths.login} replace />
