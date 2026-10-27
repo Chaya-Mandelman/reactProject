@@ -14,7 +14,12 @@ export function SummaryView({ live }: { live: LiveFinishedState }) {
   return (
     <section className="relative isolate mx-auto flex max-w-4xl flex-col items-center gap-8 text-center">
       <img className="pointer-events-none absolute inset-x-0 -top-8 -z-10 w-full opacity-70" src="/confetti.svg" alt="" aria-hidden="true" />
+      <div className="cta flex flex-wrap items-center justify-center gap-3">
+        <LiveStepButton gameId={live.game.id} action={openLobbyApi} nextPage="lobby" label="שחק שוב" />
+        <Link className="btn btn-ghost h-14 px-8" to={paths.myGames}>חזרה למשחקים שלי</Link>
+      </div>
       <img className="size-24 drop-shadow-[0_0_30px_rgb(247_201_72/0.6)] sm:size-32" src="/trophy.svg" alt="" aria-hidden="true" />
+      
       <h2 className="gold-text -mt-4 text-5xl sm:text-6xl">המנצחים</h2>
       <ol className="flex w-full flex-wrap items-end justify-center gap-5">
         {winners.map((winner, i) => (
@@ -25,10 +30,7 @@ export function SummaryView({ live }: { live: LiveFinishedState }) {
       </ol>
       <h2 className="section-title mt-4 mb-0 text-2xl">טבלת הניקוד</h2>
       <Leaderboard rows={leaderboard} />
-      <div className="cta flex flex-wrap items-center justify-center gap-3">
-        <LiveStepButton gameId={live.game.id} action={openLobbyApi} nextPage="lobby" label="שחק שוב" />
-        <Link className="btn btn-ghost h-14 px-8" to={paths.myGames}>חזרה למשחקים שלי</Link>
-      </div>
+      
     </section>
   )
 }

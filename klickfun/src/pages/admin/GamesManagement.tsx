@@ -1,5 +1,5 @@
 import { useAdminGamesFilters } from "@/hooks/admin/useAdminGamesFilters"
-import { GamesFilterBar } from "@/pages/host/myGames/GamesFilterBar"
+import { GamesFilterBar } from "@/components/GamesFilterBar"
 import { AdminGamesList } from "./games/AdminGamesList"
 import { HostSelect } from "./games/HostSelect"
 

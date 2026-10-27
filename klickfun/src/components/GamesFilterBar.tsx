@@ -1,5 +1,5 @@
-import { FilterSelect } from "@/components/FilterSelect"
-import { SearchInput } from "@/components/SearchInput"
+import { FilterSelect } from "./FilterSelect"
+import { SearchInput } from "./SearchInput"
 import { GAME_STATUS_LABELS, GAMES_SORT_LABELS } from "@/constants/game"
 import type { GamesFilters, GamesSort } from "@/types/game"
 

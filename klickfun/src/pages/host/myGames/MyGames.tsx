@@ -1,6 +1,6 @@
 import { useGamesFilters } from "@/hooks/games/useGamesFilters"
 import { OpenButton } from "@/components/OpenButton"
-import { GamesFilterBar } from "./GamesFilterBar"
+import { GamesFilterBar } from "@/components/GamesFilterBar"
 import { AddGame } from "./AddGame"
 import { GamesList } from "./GamesList"
 
