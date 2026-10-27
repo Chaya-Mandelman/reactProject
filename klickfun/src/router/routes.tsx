@@ -11,7 +11,6 @@ import GamesManagement from "@/pages/admin/GamesManagement"
 import HostsManagement from "@/pages/admin/HostsManagement"
 import { Protected } from "./Protected"
 
-// Protected עוטף כל הורה פעם אחת, וכל הדפים שבתוכו מוגנים
 export const router = createBrowserRouter([
   { index: true, element: <Home /> },
   { path: "login", element: <Login /> },
