@@ -9,11 +9,14 @@ export function HostSelect({ value, onChange }: Props) {
   const { data: hosts = [] } = useHosts()
 
   return (
-    <select className="select" value={value ?? ""} onChange={(e) => onChange(Number(e.target.value) || undefined)}>
-      <option value="">כל המנחים</option>
-      {hosts.map((host) => (
-        <option key={host.id} value={host.id}>{host.name}</option>
-      ))}
-    </select>
+    <label className="filter-label">
+      סינון לפי מנחה:
+      <select className="select" value={value ?? ""} onChange={(e) => onChange(Number(e.target.value) || undefined)}>
+        <option value="">כל המנחים</option>
+        {hosts.map((host) => (
+          <option key={host.id} value={host.id}>{host.name}</option>
+        ))}
+      </select>
+    </label>
   )
 }

@@ -1,4 +1,5 @@
 type Props<T extends string> = {
+  label: string
   labels: Record<T, string>
   value?: T
   allLabel: string
@@ -6,13 +7,16 @@ type Props<T extends string> = {
 }
 
 // בחירה מתוך מילון תוויות, עם אפשרות "הכול" שמנקה את הסינון
-export function FilterSelect<T extends string>({ labels, value, allLabel, onChange }: Props<T>) {
+export function FilterSelect<T extends string>({ label, labels, value, allLabel, onChange }: Props<T>) {
   return (
-    <select className="select" value={value ?? ""} onChange={(e) => onChange((e.target.value || undefined) as T | undefined)}>
-      <option value="">{allLabel}</option>
-      {(Object.keys(labels) as T[]).map((key) => (
-        <option key={key} value={key}>{labels[key]}</option>
-      ))}
-    </select>
+    <label className="filter-label">
+      {label}
+      <select className="select" value={value ?? ""} onChange={(e) => onChange((e.target.value || undefined) as T | undefined)}>
+        <option value="">{allLabel}</option>
+        {(Object.keys(labels) as T[]).map((key) => (
+          <option key={key} value={key}>{labels[key]}</option>
+        ))}
+      </select>
+    </label>
   )
 }

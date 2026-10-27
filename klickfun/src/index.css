@@ -144,6 +144,9 @@ body {
   .select {
     @apply h-11 cursor-pointer rounded-lg border border-cyan/25 bg-[#020a1f]/80 px-4 text-sm text-white outline-none transition duration-200 hover:border-cyan/45 focus:border-cyan [&>option]:bg-navy;
   }
+  .filter-label {
+    @apply flex items-center gap-2 text-xs font-medium whitespace-nowrap text-muted/70;
+  }
   .toggle {
     @apply inline-flex cursor-pointer items-center gap-2 rounded-full border border-cyan/25 bg-navy/80 px-4 py-2 text-sm font-semibold text-muted transition duration-200 hover:border-cyan/50 has-checked:border-gold has-checked:bg-gold/10 has-checked:text-gold;
   }

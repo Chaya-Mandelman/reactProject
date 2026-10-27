@@ -13,6 +13,7 @@ export function HostsFilterBar({ filters, onChange }: Props) {
     <>
       <SearchInput label="חיפוש לפי שם או אימייל:" value={filters.search} onSearch={(search) => onChange({ search })} />
       <FilterSelect
+        label="סינון לפי סטטוס:"
         labels={HOST_STATUS_LABELS}
         value={filters.status}
         allLabel="כל המנחים"

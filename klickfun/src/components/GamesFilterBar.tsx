@@ -16,23 +16,27 @@ export function GamesFilterBar({ filters, onChange }: Props) {
     <>
       <SearchInput label="חיפוש לפי שם המשחק:" value={filters.search} onSearch={(search) => onChange({ search })} />
       <FilterSelect
+        label="סינון לפי סטטוס:"
         labels={GAME_STATUS_LABELS}
         value={filters.status}
         allLabel="כל הסטטוסים"
         onChange={(status) => onChange({ status })}
       />
       {/* מיון ברירת המחדל לא נשמר בכתובת */}
-      <select className="select"
-        value={filters.sort ?? DEFAULT_SORT}
-        onChange={(e) => {
-          const sort = e.target.value as GamesSort
-          onChange({ sort: sort === DEFAULT_SORT ? undefined : sort })
-        }}
-      >
-        {SORTS.map((sort) => (
-          <option key={sort} value={sort}>{GAMES_SORT_LABELS[sort]}</option>
-        ))}
-      </select>
+      <label className="filter-label">
+        מיון לפי:
+        <select className="select"
+          value={filters.sort ?? DEFAULT_SORT}
+          onChange={(e) => {
+            const sort = e.target.value as GamesSort
+            onChange({ sort: sort === DEFAULT_SORT ? undefined : sort })
+          }}
+        >
+          {SORTS.map((sort) => (
+            <option key={sort} value={sort}>{GAMES_SORT_LABELS[sort]}</option>
+          ))}
+        </select>
+      </label>
     </>
   )
 }
