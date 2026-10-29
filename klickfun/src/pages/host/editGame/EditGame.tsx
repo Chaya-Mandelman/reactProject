@@ -1,7 +1,7 @@
-import { Link } from "react-router"
 import { GameForm } from "@/components/GameForm"
+import { PageNav } from "@/components/PageNav"
 import { isActiveStatus } from "@/constants/game"
-import { paths } from "@/constants/routes"
+import { getLivePath, paths } from "@/constants/routes"
 import { useGame } from "@/hooks/games/useGame"
 import { useUpdateGame } from "@/hooks/games/useGameMutations"
 import { useGameId } from "@/hooks/useGameId"
@@ -24,7 +24,10 @@ function EditGame() {
 
   return (
     <>
-      <Link className="link mt-8 flex w-fit items-center gap-2 text-sm before:content-['→']" to={paths.myGames}>חזרה למשחקים שלי</Link>
+      <PageNav
+        back={{ to: paths.myGames, label: "חזרה למשחקים שלי" }}
+        forward={locked ? { to: getLivePath(game.id, game.status), label: "חזרה למשחק הפעיל" } : undefined}
+      />
       <h1 className="page-title mt-4">עריכת משחק</h1>
       {error && <div className="alert mb-6" role="alert">{getErrorMessage(error)}</div>}
       {locked && <p className="alert-warn mb-6" role="alert">המשחק פעיל כרגע, ולכן אי אפשר לערוך אותו</p>}

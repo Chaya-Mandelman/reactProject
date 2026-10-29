@@ -1,5 +1,6 @@
 import { useState } from "react"
-import { Link, Navigate } from "react-router"
+import { Navigate } from "react-router"
+import { PageNav } from "@/components/PageNav"
 import { paths } from "@/constants/routes"
 import { useLive } from "@/hooks/gameRun/useLive"
 import { useGameId } from "@/hooks/useGameId"
@@ -23,8 +24,10 @@ function Game() {
   if (!live) return <p className="alert mx-4 mt-10 sm:mx-auto sm:max-w-xl" role="alert">{getErrorMessage(error)}</p>
 
   return (
-    <main className="stage-full mx-auto min-h-svh w-full max-w-7xl px-4 pt-14 pb-48 sm:px-6">
-      <header className="mb-8 flex flex-wrap items-center justify-between gap-4">
+    <main className="stage-full mx-auto min-h-svh w-full max-w-7xl px-4 pb-48 sm:px-6">
+      {/* יציאה מהמסך לא עוצרת את המשחק בשרת: חוזרים אליו מכרטיס המשחק */}
+      <PageNav back={{ to: paths.myGames, label: "חזרה לכל המשחקים" }} />
+      <header className="mt-6 mb-8 flex flex-wrap items-center justify-between gap-4">
         <h1 className="gold-text text-2xl tracking-tight sm:text-3xl">{live.game.title}</h1>
         {(live.phase === "QUESTION" || live.phase === "REVEAL") && (
           <GameControls
@@ -52,7 +55,7 @@ function GameStage({ live, muted }: { live: LiveState; muted: boolean }) {
     case "LOBBY":
       return <Navigate to={paths.play(live.game.id, "lobby")} replace />
     default:
-      return <p className="py-20 text-center text-muted">המשחק לא פעיל. <Link className="link" to={paths.myGames}>חזרה למשחקים שלי</Link></p>
+      return <p className="py-20 text-center text-muted">המשחק לא פעיל</p>
   }
 }
 

@@ -1,23 +1,21 @@
 import { useNavigate } from "react-router"
-import { paths } from "@/constants/routes"
-import type { PlayPage } from "@/types/liveState"
 import { useLiveMutation, type LiveAction } from "./useLiveMutation"
 
 type Options = {
   gameId: number
   action: LiveAction
-  nextPage?: PlayPage
+  to?: string
 }
 
-// משנה את מצב המשחק בשרת, ואחרי הצלחה עובר לעמוד הבא של ההרצה (אם נשלח עמוד)
-export function useStepLive({ gameId, action, nextPage }: Options) {
+// משנה את מצב המשחק בשרת, ואחרי הצלחה עובר לעמוד הבא (אם נשלח נתיב)
+export function useStepLive({ gameId, action, to }: Options) {
   const navigate = useNavigate()
   const mutation = useLiveMutation(action)
 
   const run = () => {
     mutation.mutate(gameId, {
       onSuccess: () => {
-        if (nextPage) navigate(paths.play(gameId, nextPage))
+        if (to) navigate(to)
       },
     })
   }

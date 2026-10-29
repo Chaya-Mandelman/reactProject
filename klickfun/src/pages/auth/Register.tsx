@@ -1,5 +1,6 @@
 import { Link, useNavigate } from "react-router"
 import { FieldError } from "@/components/FieldError"
+import { PageNav } from "@/components/PageNav"
 import { getHomePath, paths } from "@/constants/routes"
 import { useAuth } from "@/hooks/auth/useAuth"
 import { useRegister } from "@/hooks/auth/useRegister"
@@ -20,7 +21,8 @@ function Register() {
     })
 
   return (
-    <main className="flex min-h-svh items-center justify-center px-4 py-10">
+    <main className="flex min-h-svh flex-col items-center justify-center px-4 py-10">
+      <div className="w-full max-w-md"><PageNav back={{ to: paths.home, label: "חזרה לדף הבית" }} /></div>
       <form className="card w-full max-w-md px-9 py-10 before:mb-8 before:block before:bg-linear-to-b before:from-[#fff3c4] before:to-gold before:bg-clip-text before:text-center before:text-5xl before:font-black before:text-transparent before:content-['clickfun']" onSubmit={submit}>
         <fieldset className="flex flex-col gap-4" disabled={isSubmitting}>
           <label className="field">שם: <input className="input" {...register("name")} /></label>
