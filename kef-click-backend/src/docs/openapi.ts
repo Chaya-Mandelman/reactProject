@@ -256,7 +256,6 @@ export const openApiSpec = {
             },
           },
           timeLeftMs: { type: 'integer' },
-          revealLeftMs: { type: 'integer', nullable: true },
           isLastQuestion: { type: 'boolean' },
           answeredCount: { type: 'integer' },
           lastAnswerId: { type: 'integer', nullable: true, description: 'לשלוח כ-afterAnswerId ברענון הבא' },
@@ -296,7 +295,6 @@ export const openApiSpec = {
           questionNumber: 1,
           question: { id: 1, type: 'COMPETITIVE', text: 'מהי עיר הבירה של ישראל?', options: ['תל אביב', 'ירושלים', 'חיפה', 'באר שבע'] },
           timeLeftMs: 48000,
-          revealLeftMs: null,
           isLastQuestion: false,
           answeredCount: 1,
           lastAnswerId: 17,
@@ -519,6 +517,7 @@ export const openApiSpec = {
     '/api/games/{id}/start': { post: controlOp('התחלת המשחק', 'רק מהלובי. שאלה 1 נפתחת מיד.') },
     '/api/games/{id}/pause': { post: controlOp('השהיה', 'הטיימר נעצר ותשובות לא נקלטות.') },
     '/api/games/{id}/resume': { post: controlOp('המשך', 'הטיימר ממשיך מאותה נקודה.') },
+    '/api/games/{id}/next': { post: controlOp('לשאלה הבאה', 'רק בזמן חשיפה. אחרי השאלה האחרונה — סיום המשחק עם סיכום.') },
     '/api/games/{id}/stop': { post: controlOp('עצירה', 'מהלובי — חזרה להכנה. ממשחק רץ או מושהה — סיום מיידי עם סיכום.') },
     '/api/games/{id}/live': {
       get: {

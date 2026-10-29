@@ -106,6 +106,7 @@ describe('לובי וחיבור טלפוני', () => {
     expect((await api().post(`/api/games/${gameId}/pause`).set(host.auth)).status).toBe(409);
     expect((await api().post(`/api/games/${gameId}/resume`).set(host.auth)).status).toBe(409);
     expect((await api().post(`/api/games/${gameId}/stop`).set(host.auth)).status).toBe(409);
+    expect((await api().post(`/api/games/${gameId}/next`).set(host.auth)).status).toBe(409);
     await api().post(`/api/games/${gameId}/lobby`).set(host.auth);
     expect((await api().post(`/api/games/${gameId}/lobby`).set(host.auth)).status).toBe(409);
   });
@@ -161,14 +162,13 @@ describe('משחק מלא — ניקוד, מהירות, חשיפה, השהיה �
       ['שירה', 970],
       ['נועה', 0],
     ]);
-    expect(state.revealLeftMs).toBe(5_000);
 
     // בזמן החשיפה — מאוחר מדי
     res = await phone(NOA, '3');
     expect(res.text).toContain('הזמן לשאלה הזו הסתיים');
 
-    // ===== אחרי 5 שניות — שאלה 2 נפתחת אוטומטית =====
-    advanceMs(5_000);
+    // ===== המנחה עוברת לשאלה 2 =====
+    expect((await api().post(`/api/games/${gameId}/next`).set(host.auth)).status).toBe(200);
     state = await live(gameId, host.auth);
     expect(state.phase).toBe('QUESTION');
     expect(state.questionNumber).toBe(2);
@@ -200,8 +200,8 @@ describe('משחק מלא — ניקוד, מהירות, חשיפה, השהיה �
     state = await live(gameId, host.auth);
     expect(state.phase).toBe('REVEAL');
 
-    // ===== סיום =====
-    advanceMs(5_000);
+    // ===== אחרי השאלה האחרונה "הבא" מסיים את המשחק =====
+    expect((await api().post(`/api/games/${gameId}/next`).set(host.auth)).status).toBe(200);
     state = await live(gameId, host.auth);
     expect(state.phase).toBe('FINISHED');
     expect(state.game.status).toBe('FINISHED');
@@ -280,14 +280,19 @@ describe('משחק מלא — ניקוד, מהירות, חשיפה, השהיה �
     expect(answers.every((a) => a.isCorrect === null && a.points === 0)).toBe(true);
   });
 
-  it('אם אף אחד לא רענן את המסך — המשחק "משלים" את כל השלבים לפי השעון', async () => {
-    const { gameId, host } = await setupRunningGame([competitive('שאלה א', 1), competitive('שאלה ב', 1), competitive('שאלה ג', 1)]);
+  it('החשיפה מחכה למנחה: גם אחרי הרבה זמן המשחק לא עובר לשאלה הבאה לבד', async () => {
+    const { gameId, host } = await setupRunningGame([competitive('שאלה א', 1), competitive('שאלה ב', 1)]);
+    // בזמן שאלה פתוחה אי אפשר לדלג
+    expect((await api().post(`/api/games/${gameId}/next`).set(host.auth)).status).toBe(409);
     advanceMs(10 * 60_000);
-    const state = await live(gameId, host.auth);
-    expect(state.phase).toBe('FINISHED');
-    const game = await prisma.game.findUniqueOrThrow({ where: { id: gameId } });
-    // 3 × (60 + 5) שניות אחרי ההתחלה
-    expect(game.finishedAt!.getTime() - game.startedAt!.getTime()).toBe(3 * 65_000);
+    let state = await live(gameId, host.auth);
+    expect(state.phase).toBe('REVEAL');
+    expect(state.questionNumber).toBe(1);
+    await api().post(`/api/games/${gameId}/next`).set(host.auth);
+    state = await live(gameId, host.auth);
+    expect(state.phase).toBe('QUESTION');
+    expect(state.questionNumber).toBe(2);
+    expect(state.timeLeftMs).toBe(60_000);
   });
 
   it('עצירה באמצע — סיום מיידי עם סיכום', async () => {

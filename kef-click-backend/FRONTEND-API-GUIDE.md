@@ -196,6 +196,7 @@ Authorization: Bearer <token>
 | התחלה | `POST /api/games/:id/start` |
 | השהיה | `POST /api/games/:id/pause` |
 | המשך | `POST /api/games/:id/resume` |
+| לשאלה הבאה (מהחשיפה) | `POST /api/games/:id/next` |
 | עצירה | `POST /api/games/:id/stop` |
 | **רענון המסך** | `GET /api/games/:id/live?afterAnswerId=<מספר>` **כל שנייה** |
 
@@ -220,7 +221,7 @@ Authorization: Bearer <token>
 | `SETUP` | המשחק בהכנה |
 | `LOBBY` | רשימת `participants`, עם סימון למי ש־`connected: true`, ואת `connectedCount` |
 | `QUESTION` | `question`, טיימר לפי `timeLeftMs`, `answeredCount`, השמות הקופצים ו־`fastest` בצד |
-| `REVEAL` | התשובה הנכונה (`question.correctOption`), טבלת ניקוד (`reveal.leaderboard`) והתפלגות (`reveal.distribution`) |
+| `REVEAL` | התשובה הנכונה (`question.correctOption`), טבלת ניקוד (`reveal.leaderboard`) והתפלגות (`reveal.distribution`). החשיפה נשארת עד שהמנחה שולחת `POST /next` |
 | `FINISHED` | `summary.winners` (3 המנצחים) ו־`summary.leaderboard` |
 
 בנוסף, כשהמשחק מושהה מגיע `paused: true` (בשלבי `QUESTION` ו־`REVEAL`). זה הזמן להציג "מושהה" ולהחליף את כפתור ההשהיה בכפתור "המשך".
@@ -239,7 +240,6 @@ Authorization: Bearer <token>
     "questionNumber": 3,
     "question": { "id": 9, "type": "COMPETITIVE", "text": "...", "options": ["...", "...", "...", "..."] },
     "timeLeftMs": 48000,
-    "revealLeftMs": null,
     "isLastQuestion": false,
     "answeredCount": 7,
     "lastAnswerId": 52,

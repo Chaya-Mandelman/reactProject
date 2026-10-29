@@ -9,7 +9,7 @@ import { advance, allConnectedAnswered, elapsedInPhase, orderedQuestionIds, with
 const LOBBY_ADVISORY_LOCK = 72_042_026;
 
 // =============================================================
-//  פעולות המנחה: לובי, התחלה, השהיה, המשך, סיום
+//  פעולות המנחה: לובי, התחלה, השהיה, המשך, שאלה הבאה, סיום
 // =============================================================
 
 /** פתיחת לובי: מאפס תשובות וניקוד מהסבב הקודם, ומשחרר את הטלפונים לחיבור */
@@ -94,6 +94,27 @@ export async function resumeGame(gameId: number) {
     await tx.game.update({
       where: { id: gameId },
       data: { status: 'RUNNING', phaseStartedAt, pausedElapsedMs: null },
+    });
+  });
+}
+
+/** מעבר מהחשיפה לשאלה הבאה, או לסיום אחרי השאלה האחרונה */
+export async function nextQuestion(gameId: number) {
+  const now = new Date();
+  return withLockedGame(gameId, async (tx, locked) => {
+    if (locked.status !== 'RUNNING') throw HttpError.conflict('אפשר לעבור שאלה רק במשחק שרץ');
+    const game = await advance(tx, locked, now);
+    if (game.phase !== 'REVEAL' || game.currentQuestionIndex === null) {
+      throw HttpError.conflict('אפשר לעבור לשאלה הבאה רק אחרי חשיפת התשובה');
+    }
+    const next = game.currentQuestionIndex + 1;
+    const total = (await orderedQuestionIds(tx, gameId)).length;
+    await tx.game.update({
+      where: { id: gameId },
+      data:
+        next < total
+          ? { phase: 'QUESTION', phaseStartedAt: now, currentQuestionIndex: next }
+          : { status: 'FINISHED', finishedAt: now, phase: null, phaseStartedAt: null, currentQuestionIndex: null, pausedElapsedMs: null },
     });
   });
 }
@@ -228,7 +249,6 @@ export async function getLiveState(gameId: number, afterAnswerId?: number) {
       questionNumber: game.currentQuestionIndex + 1,
       question: publicQuestion(question, isReveal),
       timeLeftMs: isReveal ? 0 : Math.max(0, GAME_RULES.QUESTION_TIME_MS - elapsed),
-      revealLeftMs: isReveal ? Math.max(0, GAME_RULES.REVEAL_TIME_MS - elapsed) : null,
       isLastQuestion: game.currentQuestionIndex === questionIds.length - 1,
       answeredCount: answers.length,
       lastAnswerId: answers.length > 0 ? answers[answers.length - 1]!.id : null,

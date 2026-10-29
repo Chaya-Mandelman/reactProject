@@ -54,7 +54,8 @@ export async function allConnectedAnswered(tx: Tx, gameId: number, questionId: n
 
 /**
  * מקדם את המשחק לפי השעון:
- *   שאלה → (60 שניות או שכולם ענו) → חשיפה → (5 שניות) → השאלה הבאה … → סיום
+ *   שאלה → (60 שניות או שכולם ענו) → חשיפה.
+ * מהחשיפה ממשיכים רק כשהמנחה לוחצת "לשאלה הבאה" (nextQuestion).
  * מחזיר את המשחק המעודכן. עובד רק כשהסטטוס RUNNING.
  */
 export async function advance(tx: Tx, game: Game, now: Date): Promise<Game> {
@@ -94,18 +95,8 @@ export async function advance(tx: Tx, game: Game, now: Date): Promise<Game> {
       continue;
     }
 
-    // phase === 'REVEAL'
-    const revealEnd = new Date(phaseStartedAt.getTime() + GAME_RULES.REVEAL_TIME_MS);
-    if (now < revealEnd) break;
-    if (index + 1 < questionIds.length) {
-      index += 1;
-      phase = 'QUESTION';
-      phaseStartedAt = revealEnd;
-    } else {
-      status = 'FINISHED';
-      finishedAt = revealEnd;
-    }
-    changed = true;
+    // phase === 'REVEAL': החשיפה נשארת על המסך עד שהמנחה עוברת לשאלה הבאה
+    break;
   }
 
   if (!changed) return game;
