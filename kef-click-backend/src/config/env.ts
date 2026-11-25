@@ -13,6 +13,9 @@ const envSchema = z.object({
   JWT_EXPIRES_IN: z.string().default('8h'),
   CORS_ORIGIN: z.string().default('*'),
   YEMOT_SECRET: z.string().min(8, 'YEMOT_SECRET חייב להיות לפחות 8 תווים'),
+  // AI (לא חובה): בלי מפתח, כפתורי ה-AI פשוט לא מופיעים
+  OPENAI_API_KEY: z.string().trim().optional(),
+  OPENAI_MODEL: z.string().trim().min(1).default('gpt-5.5'),
 });
 
 const parsed = envSchema.safeParse(process.env);

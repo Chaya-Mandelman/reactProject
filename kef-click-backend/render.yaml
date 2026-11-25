@@ -25,3 +25,7 @@ services:
         sync: false # כתובת אתר ה-React שלך, או * לבדיקות
       - key: YEMOT_SECRET
         generateValue: true
+      - key: OPENAI_API_KEY
+        sync: false # מפתח של OpenAI ל-AI (לא חובה — בלי מפתח הכפתורים לא מופיעים)
+      - key: OPENAI_MODEL
+        value: gpt-5.5

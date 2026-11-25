@@ -6,6 +6,7 @@ import { prisma } from './db/prisma';
 import { openApiSpec } from './docs/openapi';
 import { errorHandler, notFoundHandler } from './middleware/errorHandler';
 import { adminRouter } from './modules/admin/admin.routes';
+import { aiRouter } from './modules/ai/ai.routes';
 import { authRouter } from './modules/auth/auth.routes';
 import { gamesRouter } from './modules/games/games.routes';
 import { mediaRouter } from './modules/media/media.routes';
@@ -61,6 +62,7 @@ export function createApp() {
   app.use('/api/admin', adminRouter);
   app.use('/api/games', gamesRouter);
   app.use('/api/media', mediaRouter);
+  app.use('/api/ai', aiRouter);
   app.use('/api/yemot', yemotRouter);
 
   app.use(notFoundHandler);

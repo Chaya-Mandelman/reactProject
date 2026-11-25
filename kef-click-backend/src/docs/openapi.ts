@@ -76,6 +76,7 @@ export const openApiSpec = {
     { name: 'משחקים', description: 'ניהול משחקים של המנחה' },
     { name: 'משתתפים', description: 'משתתפים במשחק (שם וטלפון)' },
     { name: 'שאלות', description: 'שאלות המשחק' },
+    { name: 'AI', description: 'יצירה עם AI (OpenAI). פעיל רק כשמוגדר OPENAI_API_KEY' },
     { name: 'הרצת משחק', description: 'לובי, התחלה, השהיה, המשך, עצירה ומצב חי' },
     { name: 'ימות המשיח', description: 'הכתובת שימות המשיח פונה אליה' },
   ],
@@ -481,6 +482,44 @@ export const openApiSpec = {
         security: bearer,
         parameters: [gameId, pid],
         responses: { 204: { description: 'נמחק' }, ...pick(401, 403, 404, 409) },
+      },
+    },
+    '/api/ai/status': {
+      get: {
+        tags: ['AI'],
+        summary: 'האם ה-AI מוגדר בשרת',
+        security: bearer,
+        responses: { 200: { description: 'מצב', content: json({ type: 'object', properties: { enabled: { type: 'boolean' } } }) }, ...pick(401) },
+      },
+    },
+    '/api/games/{id}/ai/questions': {
+      post: {
+        tags: ['AI'],
+        summary: 'יצירת טיוטות שאלות עם AI',
+        description: 'לא שומר כלום: מחזיר טיוטות, והמנחה שומרת את מה שבחרה דרך questions/bulk. שאלה לא תקינה שה-AI החזיר מושמטת (skipped). עד 20 בקשות ל-10 דקות לכל מנחה.',
+        security: bearer,
+        parameters: [gameId],
+        requestBody: {
+          required: true,
+          content: json({
+            type: 'object',
+            required: ['topic'],
+            properties: {
+              topic: { type: 'string', minLength: 2, maxLength: 200, example: 'מערכת השמש' },
+              count: { type: 'integer', minimum: 1, maximum: 20, default: 5 },
+              difficulty: { type: 'string', enum: ['EASY', 'MEDIUM', 'HARD'], default: 'MEDIUM' },
+              kind: { type: 'string', enum: ['COMPETITIVE', 'POLL', 'MIXED'], default: 'COMPETITIVE' },
+              notes: { type: 'string', maxLength: 500 },
+            },
+          }),
+        },
+        responses: {
+          200: { description: 'טיוטות', content: json({ type: 'object', properties: { questions: { type: 'array', items: ref('QuestionInput') }, skipped: { type: 'integer' } } }) },
+          429: { description: 'יותר מדי בקשות, או שה-AI עמוס' },
+          502: { description: 'שגיאה מה-AI' },
+          503: { description: 'ה-AI לא מוגדר בשרת' },
+          ...pick(400, 401, 403, 404),
+        },
       },
     },
     '/api/games/{id}/questions/bulk': {

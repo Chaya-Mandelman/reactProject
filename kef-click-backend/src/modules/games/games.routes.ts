@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { authenticate, requireRole } from '../../middleware/auth';
 import { asyncHandler } from '../../utils/asyncHandler';
 import * as play from '../gameplay/gameplay.controller';
+import * as ai from '../ai/ai.routes';
 import * as media from '../media/media.routes';
 import * as ctrl from './games.controller';
 
@@ -31,6 +32,7 @@ gamesRouter.delete('/:id/participants/:pid', hostOnly, asyncHandler(ctrl.deleteP
 // שאלות (שים לב: order לפני :qid)
 gamesRouter.put('/:id/questions/order', hostOnly, asyncHandler(ctrl.reorderQuestions));
 gamesRouter.post('/:id/questions/bulk', hostOnly, asyncHandler(ctrl.addQuestionsBulk));
+gamesRouter.post('/:id/ai/questions', hostOnly, ai.aiLimiter, asyncHandler(ai.generateGameQuestions));
 gamesRouter.post('/:id/questions', hostOnly, asyncHandler(ctrl.addQuestion));
 gamesRouter.patch('/:id/questions/:qid', hostOnly, asyncHandler(ctrl.updateQuestion));
 gamesRouter.delete('/:id/questions/:qid', hostOnly, asyncHandler(ctrl.deleteQuestion));

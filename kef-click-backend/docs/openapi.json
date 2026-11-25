@@ -37,6 +37,10 @@
       "description": "שאלות המשחק"
     },
     {
+      "name": "AI",
+      "description": "יצירה עם AI (OpenAI). פעיל רק כשמוגדר OPENAI_API_KEY"
+    },
+    {
       "name": "הרצת משחק",
       "description": "לובי, התחלה, השהיה, המשך, עצירה ומצב חי"
     },
@@ -2734,6 +2738,229 @@
                 }
               }
             }
+          }
+        }
+      }
+    },
+    "/api/ai/status": {
+      "get": {
+        "tags": [
+          "AI"
+        ],
+        "summary": "האם ה-AI מוגדר בשרת",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "מצב",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "enabled": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "חסר Token או Token לא תקין / פג תוקף",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": {
+                    "code": "UNAUTHORIZED",
+                    "message": "חסר Token. יש לשלוח Authorization: Bearer <token>"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/games/{id}/ai/questions": {
+      "post": {
+        "tags": [
+          "AI"
+        ],
+        "summary": "יצירת טיוטות שאלות עם AI",
+        "description": "לא שומר כלום: מחזיר טיוטות, והמנחה שומרת את מה שבחרה דרך questions/bulk. שאלה לא תקינה שה-AI החזיר מושמטת (skipped). עד 20 בקשות ל-10 דקות לכל מנחה.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "מזהה המשחק",
+            "schema": {
+              "type": "integer",
+              "example": 1
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "topic"
+                ],
+                "properties": {
+                  "topic": {
+                    "type": "string",
+                    "minLength": 2,
+                    "maxLength": 200,
+                    "example": "מערכת השמש"
+                  },
+                  "count": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 20,
+                    "default": 5
+                  },
+                  "difficulty": {
+                    "type": "string",
+                    "enum": [
+                      "EASY",
+                      "MEDIUM",
+                      "HARD"
+                    ],
+                    "default": "MEDIUM"
+                  },
+                  "kind": {
+                    "type": "string",
+                    "enum": [
+                      "COMPETITIVE",
+                      "POLL",
+                      "MIXED"
+                    ],
+                    "default": "COMPETITIVE"
+                  },
+                  "notes": {
+                    "type": "string",
+                    "maxLength": 500
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "טיוטות",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "questions": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/QuestionInput"
+                      }
+                    },
+                    "skipped": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "קלט לא תקין",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": {
+                    "code": "BAD_REQUEST",
+                    "message": "הנתונים שנשלחו אינם תקינים",
+                    "details": [
+                      {
+                        "field": "title",
+                        "message": "שם המשחק קצר מדי"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "חסר Token או Token לא תקין / פג תוקף",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": {
+                    "code": "UNAUTHORIZED",
+                    "message": "חסר Token. יש לשלוח Authorization: Bearer <token>"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "אין הרשאה לפעולה (תפקיד לא מתאים או חשבון חסום)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": {
+                    "code": "FORBIDDEN",
+                    "message": "אין לך הרשאה לפעולה זו"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "לא נמצא (או שייך למשתמש אחר)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": {
+                    "code": "NOT_FOUND",
+                    "message": "המשחק לא נמצא"
+                  }
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "יותר מדי בקשות, או שה-AI עמוס"
+          },
+          "502": {
+            "description": "שגיאה מה-AI"
+          },
+          "503": {
+            "description": "ה-AI לא מוגדר בשרת"
           }
         }
       }
