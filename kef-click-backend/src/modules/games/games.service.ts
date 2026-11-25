@@ -40,7 +40,7 @@ export async function getAccessibleGame(user: AuthUser, gameId: number, mode: 'r
   return game;
 }
 
-function assertEditable(game: Game) {
+export function assertEditable(game: Game) {
   if (!EDITABLE_STATUSES.includes(game.status)) {
     throw HttpError.conflict('אי אפשר לערוך משחק בזמן לובי או משחק פעיל. יש לסיים אותו קודם (stop)');
   }
@@ -85,7 +85,10 @@ export async function listGames(query: GameListQuery) {
   }));
 }
 
-export function serializeQuestion(q: Question) {
+/** שליפת שאלה עם המזהה של התמונה בלבד (בלי הבייטים) */
+export const withImageId = { media: { select: { id: true } } } as const;
+
+export function serializeQuestion(q: Question & { media?: { id: string } | null }) {
   return {
     id: q.id,
     order: q.order,
@@ -96,6 +99,7 @@ export function serializeQuestion(q: Question) {
     option3: q.option3,
     option4: q.option4,
     correctOption: q.correctOption,
+    imageId: q.media?.id ?? null,
   };
 }
 
@@ -104,7 +108,7 @@ export async function getGameDetails(gameId: number) {
     where: { id: gameId },
     include: {
       host: { select: { id: true, name: true } },
-      questions: { orderBy: [{ order: 'asc' }, { id: 'asc' }] },
+      questions: { orderBy: [{ order: 'asc' }, { id: 'asc' }], include: withImageId },
       participants: { orderBy: [{ name: 'asc' }, { id: 'asc' }] },
     },
   });
@@ -144,11 +148,14 @@ export async function deleteGame(user: AuthUser, game: Game) {
   await prisma.game.delete({ where: { id: game.id } });
 }
 
-/** שכפול: שם חדש, אותן שאלות ואותם משתתפים, סטטוס הכנה */
+/** שכפול: שם חדש, אותן שאלות (כולל תמונות) ואותם משתתפים, סטטוס הכנה */
 export async function duplicateGame(hostId: number, gameId: number) {
   const src = await prisma.game.findUniqueOrThrow({
     where: { id: gameId },
-    include: { questions: { orderBy: [{ order: 'asc' }, { id: 'asc' }] }, participants: true },
+    include: {
+      questions: { orderBy: [{ order: 'asc' }, { id: 'asc' }], include: { media: true } },
+      participants: true,
+    },
   });
   const suffix = ' (עותק)';
   const title = src.title.slice(0, 100 - suffix.length) + suffix;
@@ -168,6 +175,7 @@ export async function duplicateGame(hostId: number, gameId: number) {
           option3: q.option3,
           option4: q.option4,
           correctOption: q.correctOption,
+          ...(q.media ? { media: { create: { mimeType: q.media.mimeType, size: q.media.size, data: q.media.data } } } : {}),
         })),
       },
       participants: { create: src.participants.map((p) => ({ name: p.name, phone: p.phone })) },
@@ -246,7 +254,7 @@ export async function updateQuestion(game: Game, questionId: number, input: Upda
     option4: input.option4 ?? q.option4,
     correctOption,
   });
-  const updated = await prisma.question.update({ where: { id: q.id }, data });
+  const updated = await prisma.question.update({ where: { id: q.id }, data, include: withImageId });
   return serializeQuestion(updated);
 }
 
@@ -278,6 +286,6 @@ export async function reorderQuestions(game: Game, questionIds: number[]) {
   await prisma.$transaction(
     questionIds.map((id, i) => prisma.question.update({ where: { id }, data: { order: i + 1 } })),
   );
-  const questions = await prisma.question.findMany({ where: { gameId: game.id }, orderBy: { order: 'asc' } });
+  const questions = await prisma.question.findMany({ where: { gameId: game.id }, orderBy: { order: 'asc' }, include: withImageId });
   return questions.map(serializeQuestion);
 }

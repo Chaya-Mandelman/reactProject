@@ -24,7 +24,7 @@ const pid = { name: 'pid', in: 'path', required: true, description: 'מזהה ה
 const qid = { name: 'qid', in: 'path', required: true, description: 'מזהה השאלה', schema: { type: 'integer', example: 1 } };
 
 const exampleUser = { id: 2, name: 'רחל לוי', email: 'rachel.levi@kefclick.local', role: 'HOST', isBlocked: false, createdAt: '2026-10-23T08:00:00.000Z' };
-const exampleQuestion = { id: 1, order: 1, type: 'COMPETITIVE', text: 'מהי עיר הבירה של ישראל?', option1: 'תל אביב', option2: 'ירושלים', option3: 'חיפה', option4: 'באר שבע', correctOption: 2 };
+const exampleQuestion = { id: 1, order: 1, type: 'COMPETITIVE', text: 'מהי עיר הבירה של ישראל?', option1: 'תל אביב', option2: 'ירושלים', option3: 'חיפה', option4: 'באר שבע', correctOption: 2, imageId: null };
 const exampleGame = {
   id: 1,
   title: 'חידון גיאוגרפיה — כיתה ו׳1',
@@ -204,6 +204,7 @@ export const openApiSpec = {
           option3: { type: 'string' },
           option4: { type: 'string' },
           correctOption: { type: 'integer', minimum: 1, maximum: 4, nullable: true, description: 'ריק בסקר' },
+          imageId: { type: 'string', format: 'uuid', nullable: true, description: 'מזהה התמונה. מוצגת בכתובת /api/media/{imageId}' },
         },
         example: exampleQuestion,
       },
@@ -511,6 +512,37 @@ export const openApiSpec = {
         security: bearer,
         parameters: [gameId, qid],
         responses: { 204: { description: 'נמחקה' }, ...pick(401, 403, 404, 409) },
+      },
+    },
+    '/api/games/{id}/questions/{qid}/image': {
+      put: {
+        tags: ['שאלות'],
+        summary: 'העלאה או החלפה של תמונה לשאלה',
+        description: 'גוף הבקשה הוא הקובץ עצמו (לא JSON), עד 2MB. הסוג נבדק לפי התוכן: JPG, PNG, WEBP או GIF. החלפה יוצרת מזהה חדש.',
+        security: bearer,
+        parameters: [gameId, qid],
+        requestBody: { required: true, content: { 'image/*': { schema: { type: 'string', format: 'binary' } } } },
+        responses: {
+          200: { description: 'נשמרה', content: json({ type: 'object', properties: { imageId: { type: 'string', format: 'uuid' } } }) },
+          413: { description: 'הקובץ גדול מדי' },
+          ...pick(400, 401, 403, 404, 409),
+        },
+      },
+      delete: {
+        tags: ['שאלות'],
+        summary: 'מחיקת התמונה של השאלה',
+        security: bearer,
+        parameters: [gameId, qid],
+        responses: { 204: { description: 'נמחקה' }, ...pick(401, 403, 404, 409) },
+      },
+    },
+    '/api/media/{imageId}': {
+      get: {
+        tags: ['שאלות'],
+        summary: 'הצגת תמונה של שאלה',
+        description: 'ציבורי, בלי Token. המזהה אקראי, והתמונה לא משתנה (נשמרת בזיכרון הדפדפן).',
+        parameters: [{ name: 'imageId', in: 'path', required: true, schema: { type: 'string', format: 'uuid' } }],
+        responses: { 200: { description: 'התמונה', content: { 'image/*': { schema: { type: 'string', format: 'binary' } } } }, 400: { description: 'מזהה לא תקין' }, 404: { description: 'לא נמצאה' } },
       },
     },
     '/api/games/{id}/lobby': { post: controlOp('פתיחת לובי', 'מאפס תשובות וניקוד מהסבב הקודם. דורש לפחות שאלה ומשתתף. נכשל (409) אם טלפון כבר רשום במשחק פעיל אחר.') },

@@ -1,5 +1,6 @@
 import { nextQuestionApi } from "@/api/gameRun"
 import { LiveStepButton } from "@/components/LiveStepButton"
+import { QuestionImage } from "@/components/QuestionImage"
 import type { LiveRevealState } from "@/types/liveState"
 import { Distribution } from "./Distribution"
 import { Leaderboard } from "./Leaderboard"
@@ -15,6 +16,7 @@ export function RevealView({ live }: { live: LiveRevealState }) {
   return (
     <section className="mx-auto flex max-w-5xl flex-col items-center gap-10 pt-4">
       <QuestionHeader live={live} />
+      <QuestionImage imageId={question.imageId} className="max-h-[25vh]" />
       {isPoll
         ? <Distribution options={question.options} counts={reveal.distribution} />
         : <OptionsList options={question.options} correctOption={reveal.correctOption} />}

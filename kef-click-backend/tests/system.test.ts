@@ -46,7 +46,7 @@ describe('Swagger', () => {
     // אוספים את כל הנתיבים מתוך Express
     type Layer = { route?: { path: string; methods: Record<string, boolean> }; name: string; handle: { stack?: Layer[] }; regexp: RegExp };
     const routes = new Set<string>();
-    const mounts: Record<string, string> = { authRouter: '/api/auth', adminRouter: '/api/admin', gamesRouter: '/api/games', yemotRouter: '/api/yemot' };
+    const mounts: Record<string, string> = { authRouter: '/api/auth', adminRouter: '/api/admin', gamesRouter: '/api/games', yemotRouter: '/api/yemot', mediaRouter: '/api/media' };
     const stack = (app as unknown as { _router: { stack: Layer[] } })._router.stack;
     for (const layer of stack) {
       if (layer.route) {

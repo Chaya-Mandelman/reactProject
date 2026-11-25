@@ -13,7 +13,12 @@ export interface Question {
   option4: string
   // בסקר אין תשובה נכונה
   correctOption: OptionNumber | null
+  // מזהה התמונה של השאלה, או null אם אין
+  imageId: string | null
 }
 
-// מה שנשלח בהוספה ובעריכה
-export type QuestionInput = Omit<Question, "id" | "order">
+// מה שנשלח בהוספה ובעריכה (התמונה נשלחת בנפרד)
+export type QuestionInput = Omit<Question, "id" | "order" | "imageId">
+
+// מה לעשות עם התמונה בשמירת השאלה
+export type ImageChange = { kind: "keep" } | { kind: "set"; blob: Blob; previewUrl: string } | { kind: "remove" }

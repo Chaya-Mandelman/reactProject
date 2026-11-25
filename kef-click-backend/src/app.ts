@@ -8,6 +8,7 @@ import { errorHandler, notFoundHandler } from './middleware/errorHandler';
 import { adminRouter } from './modules/admin/admin.routes';
 import { authRouter } from './modules/auth/auth.routes';
 import { gamesRouter } from './modules/games/games.routes';
+import { mediaRouter } from './modules/media/media.routes';
 import { yemotRouter } from './modules/yemot/yemot.routes';
 
 export function createApp() {
@@ -59,6 +60,7 @@ export function createApp() {
   app.use('/api/auth', authRouter);
   app.use('/api/admin', adminRouter);
   app.use('/api/games', gamesRouter);
+  app.use('/api/media', mediaRouter);
   app.use('/api/yemot', yemotRouter);
 
   app.use(notFoundHandler);

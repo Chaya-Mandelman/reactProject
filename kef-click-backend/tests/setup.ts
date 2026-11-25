@@ -5,7 +5,7 @@ import { prisma } from '../src/db/prisma';
 beforeEach(async () => {
   vi.useRealTimers();
   await prisma.$executeRawUnsafe(
-    'TRUNCATE TABLE "Answer", "Question", "Participant", "Game", "User" RESTART IDENTITY CASCADE',
+    'TRUNCATE TABLE "Answer", "QuestionMedia", "Question", "Participant", "Game", "User" RESTART IDENTITY CASCADE',
   );
 });
 

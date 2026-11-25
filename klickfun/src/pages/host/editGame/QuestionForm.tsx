@@ -1,8 +1,10 @@
+import { useState } from "react"
 import { z } from "zod"
 import { useWatch } from "react-hook-form"
 import { useApiForm } from "@/hooks/useApiForm"
 import { FieldError } from "@/components/FieldError"
-import type { OptionNumber, Question, QuestionInput } from "@/types/question"
+import type { ImageChange, OptionNumber, Question, QuestionInput } from "@/types/question"
+import { ImagePicker } from "./ImagePicker"
 
 const OPTIONS = [1, 2, 3, 4] as const
 const option = (n: number) => z.string().trim().min(1, `תשובה ${n} חובה`).max(120, `תשובה ${n} ארוכה מדי`)
@@ -48,14 +50,15 @@ const toInput = ({ correctOption, ...q }: QuestionValues): QuestionInput => ({
 type Props = {
   question?: Question
   submitLabel: string
-  onSubmit: (data: QuestionInput) => Promise<unknown>
+  onSubmit: (data: QuestionInput, image: ImageChange) => Promise<unknown>
   onCancel: () => void
 }
 
 export function QuestionForm({ question, submitLabel, onSubmit, onCancel }: Props) {
   "use no memo" // React Compiler מסתיר את השגיאות של react-hook-form
+  const [image, setImage] = useState<ImageChange>({ kind: "keep" })
   const { register, control, submit, serverError, formState: { errors, isSubmitting } } =
-    useApiForm(questionSchema, toValues(question), (values) => onSubmit(toInput(values)))
+    useApiForm(questionSchema, toValues(question), (values) => onSubmit(toInput(values), image))
   const isCompetitive = useWatch({ control, name: "type" }) === "COMPETITIVE"
 
   return (
@@ -68,6 +71,8 @@ export function QuestionForm({ question, submitLabel, onSubmit, onCancel }: Prop
           <input className="input h-12 w-full text-base" placeholder="נוסח השאלה" {...register("text")} />
           <FieldError error={errors.text} />
         </div>
+
+        <ImagePicker currentImageId={question?.imageId ?? null} value={image} onChange={setImage} disabled={isSubmitting} />
 
         {isCompetitive && <p className="w-full text-sm font-semibold text-gold">סמני את התשובה הנכונה:</p>}
         {OPTIONS.map((n) => (

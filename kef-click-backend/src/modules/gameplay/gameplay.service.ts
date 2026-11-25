@@ -2,7 +2,7 @@ import type { Game, Question } from '@prisma/client';
 import { GAME_RULES, pointsForCorrect } from '../../config/game';
 import { prisma } from '../../db/prisma';
 import { HttpError } from '../../utils/HttpError';
-import { ACTIVE_STATUSES } from '../games/games.service';
+import { ACTIVE_STATUSES, withImageId } from '../games/games.service';
 import { advance, allConnectedAnswered, elapsedInPhase, orderedQuestionIds, withLockedGame, type Tx } from './engine';
 
 /** מספר קבוע לנעילה גלובלית בזמן פתיחת לובי — מונע ששני משחקים יתפסו אותו טלפון בו-זמנית */
@@ -170,12 +170,13 @@ async function leaderboard(tx: Tx, gameId: number) {
     .map((row, i) => ({ rank: i + 1, ...row }));
 }
 
-function publicQuestion(q: Question, withAnswer: boolean) {
+function publicQuestion(q: Question & { media: { id: string } | null }, withAnswer: boolean) {
   return {
     id: q.id,
     type: q.type,
     text: q.text,
     options: [q.option1, q.option2, q.option3, q.option4],
+    imageId: q.media?.id ?? null,
     ...(withAnswer ? { correctOption: q.correctOption } : {}),
   };
 }
@@ -218,7 +219,7 @@ export async function getLiveState(gameId: number, afterAnswerId?: number) {
     }
 
     const questionId = questionIds[game.currentQuestionIndex];
-    const question = questionId ? await tx.question.findUnique({ where: { id: questionId } }) : null;
+    const question = questionId ? await tx.question.findUnique({ where: { id: questionId }, include: withImageId }) : null;
     if (!question) return { ...base, phase: game.status as 'RUNNING' | 'PAUSED' };
 
     const elapsed = elapsedInPhase(game, now);

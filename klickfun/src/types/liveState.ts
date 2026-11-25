@@ -20,7 +20,7 @@ export interface LiveParticipant extends Pick<Participant, "id" | "name"> {
 }
 
 // בזמן שאלה התשובה הנכונה לא נשלחת. בחשיפה היא מגיעה (ובסקר היא null)
-export interface LiveQuestion extends Pick<Question, "id" | "type" | "text"> {
+export interface LiveQuestion extends Pick<Question, "id" | "type" | "text" | "imageId"> {
   options: [string, string, string, string]
   correctOption?: OptionNumber | null
 }

@@ -20,6 +20,11 @@ export function errorHandler(err: unknown, _req: Request, res: Response, _next: 
     return res.status(400).json({ error: { code: 'BAD_JSON', message: 'גוף הבקשה אינו JSON תקין' } });
   }
 
+  // גוף בקשה גדול מהמותר (למשל תמונה גדולה מדי)
+  if (typeof err === 'object' && err !== null && (err as { type?: string }).type === 'entity.too.large') {
+    return res.status(413).json({ error: { code: 'TOO_LARGE', message: 'הקובץ גדול מדי (עד 2MB)' } });
+  }
+
   if (err instanceof Prisma.PrismaClientKnownRequestError) {
     if (err.code === 'P2002') {
       return res.status(409).json({ error: { code: 'CONFLICT', message: 'ערך כפול — כבר קיים רשומה עם אותם פרטים' } });

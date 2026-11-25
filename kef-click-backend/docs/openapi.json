@@ -362,7 +362,8 @@
               "option2": "ירושלים",
               "option3": "חיפה",
               "option4": "באר שבע",
-              "correctOption": 2
+              "correctOption": 2,
+              "imageId": null
             }
           ],
           "participants": [
@@ -475,6 +476,12 @@
             "maximum": 4,
             "nullable": true,
             "description": "ריק בסקר"
+          },
+          "imageId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true,
+            "description": "מזהה התמונה. מוצגת בכתובת /api/media/{imageId}"
           }
         },
         "example": {
@@ -486,7 +493,8 @@
           "option2": "ירושלים",
           "option3": "חיפה",
           "option4": "באר שבע",
-          "correctOption": 2
+          "correctOption": 2,
+          "imageId": null
         }
       },
       "QuestionInput": {
@@ -3120,6 +3128,301 @@
                 }
               }
             }
+          }
+        }
+      }
+    },
+    "/api/games/{id}/questions/{qid}/image": {
+      "put": {
+        "tags": [
+          "שאלות"
+        ],
+        "summary": "העלאה או החלפה של תמונה לשאלה",
+        "description": "גוף הבקשה הוא הקובץ עצמו (לא JSON), עד 2MB. הסוג נבדק לפי התוכן: JPG, PNG, WEBP או GIF. החלפה יוצרת מזהה חדש.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "מזהה המשחק",
+            "schema": {
+              "type": "integer",
+              "example": 1
+            }
+          },
+          {
+            "name": "qid",
+            "in": "path",
+            "required": true,
+            "description": "מזהה השאלה",
+            "schema": {
+              "type": "integer",
+              "example": 1
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "image/*": {
+              "schema": {
+                "type": "string",
+                "format": "binary"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "נשמרה",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "imageId": {
+                      "type": "string",
+                      "format": "uuid"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "קלט לא תקין",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": {
+                    "code": "BAD_REQUEST",
+                    "message": "הנתונים שנשלחו אינם תקינים",
+                    "details": [
+                      {
+                        "field": "title",
+                        "message": "שם המשחק קצר מדי"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "חסר Token או Token לא תקין / פג תוקף",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": {
+                    "code": "UNAUTHORIZED",
+                    "message": "חסר Token. יש לשלוח Authorization: Bearer <token>"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "אין הרשאה לפעולה (תפקיד לא מתאים או חשבון חסום)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": {
+                    "code": "FORBIDDEN",
+                    "message": "אין לך הרשאה לפעולה זו"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "לא נמצא (או שייך למשתמש אחר)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": {
+                    "code": "NOT_FOUND",
+                    "message": "המשחק לא נמצא"
+                  }
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "התנגשות — הפעולה לא מתאימה למצב הנוכחי",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": {
+                    "code": "CONFLICT",
+                    "message": "אי אפשר לערוך משחק בזמן לובי או משחק פעיל. יש לסיים אותו קודם (stop)"
+                  }
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "הקובץ גדול מדי"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "שאלות"
+        ],
+        "summary": "מחיקת התמונה של השאלה",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "מזהה המשחק",
+            "schema": {
+              "type": "integer",
+              "example": 1
+            }
+          },
+          {
+            "name": "qid",
+            "in": "path",
+            "required": true,
+            "description": "מזהה השאלה",
+            "schema": {
+              "type": "integer",
+              "example": 1
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "נמחקה"
+          },
+          "401": {
+            "description": "חסר Token או Token לא תקין / פג תוקף",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": {
+                    "code": "UNAUTHORIZED",
+                    "message": "חסר Token. יש לשלוח Authorization: Bearer <token>"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "אין הרשאה לפעולה (תפקיד לא מתאים או חשבון חסום)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": {
+                    "code": "FORBIDDEN",
+                    "message": "אין לך הרשאה לפעולה זו"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "לא נמצא (או שייך למשתמש אחר)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": {
+                    "code": "NOT_FOUND",
+                    "message": "המשחק לא נמצא"
+                  }
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "התנגשות — הפעולה לא מתאימה למצב הנוכחי",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": {
+                    "code": "CONFLICT",
+                    "message": "אי אפשר לערוך משחק בזמן לובי או משחק פעיל. יש לסיים אותו קודם (stop)"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/media/{imageId}": {
+      "get": {
+        "tags": [
+          "שאלות"
+        ],
+        "summary": "הצגת תמונה של שאלה",
+        "description": "ציבורי, בלי Token. המזהה אקראי, והתמונה לא משתנה (נשמרת בזיכרון הדפדפן).",
+        "parameters": [
+          {
+            "name": "imageId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "התמונה",
+            "content": {
+              "image/*": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "מזהה לא תקין"
+          },
+          "404": {
+            "description": "לא נמצאה"
           }
         }
       }

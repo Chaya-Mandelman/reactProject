@@ -1,3 +1,4 @@
+import { QuestionImage } from "@/components/QuestionImage"
 import type { LiveQuestionState } from "@/types/liveState"
 import { AnswerPopups } from "./AnswerPopups"
 import { FastestList } from "./FastestList"
@@ -20,6 +21,7 @@ export function QuestionView({ live, muted }: Props) {
       </aside>
       <section className="flex flex-col items-center gap-10 pt-4">
         <QuestionHeader live={live} />
+        <QuestionImage imageId={live.question.imageId} />
         <OptionsList options={live.question.options} />
         <AnswerPopups answers={live.recentAnswers} />
       </section>

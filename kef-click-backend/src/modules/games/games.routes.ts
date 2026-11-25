@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { authenticate, requireRole } from '../../middleware/auth';
 import { asyncHandler } from '../../utils/asyncHandler';
 import * as play from '../gameplay/gameplay.controller';
+import * as media from '../media/media.routes';
 import * as ctrl from './games.controller';
 
 /**
@@ -31,6 +32,8 @@ gamesRouter.put('/:id/questions/order', hostOnly, asyncHandler(ctrl.reorderQuest
 gamesRouter.post('/:id/questions', hostOnly, asyncHandler(ctrl.addQuestion));
 gamesRouter.patch('/:id/questions/:qid', hostOnly, asyncHandler(ctrl.updateQuestion));
 gamesRouter.delete('/:id/questions/:qid', hostOnly, asyncHandler(ctrl.deleteQuestion));
+gamesRouter.put('/:id/questions/:qid/image', hostOnly, media.rawImageBody, asyncHandler(media.upload));
+gamesRouter.delete('/:id/questions/:qid/image', hostOnly, asyncHandler(media.remove));
 
 // הרצת המשחק
 gamesRouter.post('/:id/lobby', hostOnly, asyncHandler(play.lobby));

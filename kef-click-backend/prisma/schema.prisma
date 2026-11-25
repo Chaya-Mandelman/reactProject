@@ -111,10 +111,23 @@ model Question {
   createdAt     DateTime     @default(now())
   updatedAt     DateTime     @updatedAt
 
-  game    Game     @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  game    Game           @relation(fields: [gameId], references: [id], onDelete: Cascade)
   answers Answer[]
+  media   QuestionMedia?
 
   @@index([gameId, order])
+}
+
+/// תמונה של שאלה — בטבלה נפרדת, כדי שהבייטים לא ייטענו בכל שליפה של שאלה
+model QuestionMedia {
+  id         String   @id @default(uuid()) @db.Uuid // מזהה אקראי — הכתובת הציבורית של התמונה
+  questionId Int      @unique
+  mimeType   String   @db.VarChar(40)
+  size       Int
+  data       Bytes
+  createdAt  DateTime @default(now())
+
+  question Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
 }
 
 /// תשובה של משתתף לשאלה — אחת בלבד לכל שאלה
