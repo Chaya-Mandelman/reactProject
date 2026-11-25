@@ -125,3 +125,23 @@ describe('AI — הדבקה חכמה של משתתפים', () => {
     expect(spy).not.toHaveBeenCalled();
   });
 });
+
+describe('AI — הגנה על המפתח', () => {
+  it('מפתח עם רווח או ירידת שורה לא נחשב תקין', async () => {
+    const { isUsableKey } = await import('../src/modules/ai/ai.provider');
+    expect(isUsableKey('sk-proj-abcdefgh12345678')).toBe(true);
+    expect(isUsableKey(undefined)).toBe(false);
+    expect(isUsableKey('')).toBe(false);
+    expect(isUsableKey('sk-proj-abcdefgh12345678\nOPENAI_MODEL=gpt-4o-mini')).toBe(false);
+    expect(isUsableKey('sk-proj-abc defgh')).toBe(false);
+  });
+
+  it('היומן לא כולל את המפתח', async () => {
+    const { describeError, redactSecrets } = await import('../src/modules/ai/ai.provider');
+    const key = 'sk-proj-SECRETsecret1234567890\nOPENAI_MODEL=gpt-4o-mini';
+    const text = redactSecrets(`Headers.append: "Bearer ${key}" is an invalid header value`, key);
+    expect(text).not.toContain('SECRETsecret');
+    expect(text).toContain('Bearer sk-***');
+    expect(describeError(new TypeError('Bearer sk-proj-OTHERkey9876543210 bad'))).toBe('TypeError: Bearer sk-*** bad');
+  });
+});

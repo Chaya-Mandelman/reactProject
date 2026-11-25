@@ -2,13 +2,40 @@ import OpenAI from 'openai';
 import { env } from '../../config/env';
 import { HttpError } from '../../utils/HttpError';
 
-/** האם מוגדר מפתח של OpenAI */
-export const aiEnabled = () => Boolean(env.OPENAI_API_KEY);
+/** מפתח תקין הוא מילה אחת: בלי רווחים ובלי ירידת שורה (למשל כשהודבקו כמה שורות מ-.env לשדה אחד) */
+export const isUsableKey = (key: string | undefined): key is string => Boolean(key) && !/\s/.test(key!);
+
+/** מסתיר מפתחות מכל טקסט שנכתב ליומן */
+export function redactSecrets(text: string, key = env.OPENAI_API_KEY): string {
+  let out = text.replace(/sk-[A-Za-z0-9_-]{8,}/g, 'sk-***');
+  if (key) {
+    for (const part of key.split(/\s+/).filter((p) => p.length >= 8)) out = out.split(part).join('***');
+  }
+  return out;
+}
+
+/** תיאור קצר ובטוח של שגיאה ליומן: סוג, קוד והודעה — בלי כותרות הבקשה ובלי המפתח */
+export function describeError(error: unknown): string {
+  if (error instanceof OpenAI.APIError) {
+    return redactSecrets(`${error.name} status=${error.status ?? '-'} code=${error.code ?? '-'} ${error.message}`);
+  }
+  if (error instanceof Error) return redactSecrets(`${error.name}: ${error.message}`);
+  return 'unknown error';
+}
+
+const apiKey = isUsableKey(env.OPENAI_API_KEY) ? env.OPENAI_API_KEY : undefined;
+if (env.OPENAI_API_KEY && !apiKey) {
+  // eslint-disable-next-line no-console
+  console.error('❌ OPENAI_API_KEY מכיל רווח או ירידת שורה — ה-AI כבוי. יש להזין ב-Render רק את המפתח, בשורה אחת');
+}
+
+/** האם מוגדר מפתח תקין של OpenAI */
+export const aiEnabled = () => Boolean(apiKey);
 
 let client: OpenAI | null = null;
 function getClient() {
-  if (!env.OPENAI_API_KEY) throw new HttpError(503, 'AI_DISABLED', 'יצירה עם AI לא מוגדרת בשרת (חסר OPENAI_API_KEY)');
-  client ??= new OpenAI({ apiKey: env.OPENAI_API_KEY, timeout: 90_000, maxRetries: 1 });
+  if (!apiKey) throw new HttpError(503, 'AI_DISABLED', 'יצירה עם AI לא מוגדרת בשרת (חסר OPENAI_API_KEY או שהוא לא תקין)');
+  client ??= new OpenAI({ apiKey, timeout: 90_000, maxRetries: 1 });
   return client;
 }
 
@@ -22,8 +49,12 @@ function toHttpError(error: unknown): HttpError {
     return new HttpError(429, 'AI_BUSY', 'ה-AI עמוס או שנגמרה המכסה בחשבון OpenAI. נסי שוב בעוד כמה דקות');
   }
   if (error instanceof OpenAI.APIConnectionTimeoutError) return new HttpError(504, 'AI_TIMEOUT', 'ה-AI לא ענה בזמן. נסי שוב');
+  if (error instanceof OpenAI.NotFoundError) {
+    return new HttpError(502, 'AI_ERROR', `המודל ${env.OPENAI_MODEL} לא זמין בחשבון OpenAI. יש לשנות את OPENAI_MODEL`);
+  }
+  // רק תיאור קצר ובטוח — אובייקט השגיאה המלא עלול לכלול את המפתח
   // eslint-disable-next-line no-console
-  console.error('OpenAI error:', error);
+  console.error('OpenAI error:', describeError(error));
   return new HttpError(502, 'AI_ERROR', 'ה-AI לא הצליח לענות כרגע. נסי שוב');
 }
 
