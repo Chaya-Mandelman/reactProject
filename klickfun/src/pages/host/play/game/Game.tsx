@@ -33,6 +33,7 @@ function Game() {
           <GameControls
             gameId={live.game.id}
             paused={live.paused}
+            canSkip={live.phase === "QUESTION"}
             muted={muted}
             onToggleMute={() => setMuted((prev) => !prev)}
           />

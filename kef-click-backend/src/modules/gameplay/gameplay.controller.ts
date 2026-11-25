@@ -43,6 +43,12 @@ export async function next(req: Request, res: Response) {
   await respondLive(res, game.id);
 }
 
+export async function skip(req: Request, res: Response) {
+  const { game } = await loadGame(req, 'write');
+  await service.skipQuestion(game.id);
+  await respondLive(res, game.id);
+}
+
 export async function stop(req: Request, res: Response) {
   const { game } = await loadGame(req, 'write');
   await service.stopGame(game.id);

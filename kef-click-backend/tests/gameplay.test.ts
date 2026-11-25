@@ -329,3 +329,57 @@ describe('משחק מלא — ניקוד, מהירות, חשיפה, השהיה �
     expect(scores.every((s) => s.score === 0 || s.score === 960)).toBe(true);
   });
 });
+
+describe('דילוג על שאלה', () => {
+  it('מבטל את השאלה: התשובות והנקודות נמחקות ועוברים לשאלה הבאה', async () => {
+    const { host, gameId, questionIds } = await setupRunningGame([competitive('ש1', 2), competitive('ש2', 3), competitive('ש3', 1)]);
+
+    // שאלה 1 רגילה: שירה עונה נכון
+    await phone(SHIRA, '2');
+    await phone(NOA, '1');
+    await api().post(`/api/games/${gameId}/next`).set(host.auth);
+
+    // שאלה 2: שירה עונה נכון, ואז המנחה מדלגת
+    advanceMs(1_000);
+    expect((await phone(SHIRA, '3')).text).toContain('990');
+    advanceMs(5_000);
+    const res = await api().post(`/api/games/${gameId}/skip`).set(host.auth);
+    expect(res.status).toBe(200);
+    expect(res.body.live).toMatchObject({ phase: 'QUESTION', questionNumber: 3, timeLeftMs: 60_000, answeredCount: 0 });
+
+    expect(await prisma.answer.count({ where: { questionId: questionIds[1] } })).toBe(0);
+    const shira = await prisma.participant.findFirstOrThrow({ where: { gameId, phone: SHIRA } });
+    expect(shira.score).toBe(1_000); // רק הנקודות של שאלה 1
+
+    // אפשר לענות על השאלה החדשה
+    expect((await phone(NOA, '1')).text).toContain('תשובה נכונה');
+  });
+
+  it('דילוג על השאלה האחרונה מסיים את המשחק', async () => {
+    const { host, gameId } = await setupRunningGame([competitive('יחידה', 2)]);
+    await phone(SHIRA, '2');
+    const res = await api().post(`/api/games/${gameId}/skip`).set(host.auth);
+    expect(res.body.live.phase).toBe('FINISHED');
+    expect(res.body.live.summary.leaderboard.every((r: { score: number }) => r.score === 0)).toBe(true);
+  });
+
+  it('דילוג במשחק מושהה פותח את השאלה הבאה רצה', async () => {
+    const { host, gameId } = await setupRunningGame();
+    await api().post(`/api/games/${gameId}/pause`).set(host.auth);
+    const res = await api().post(`/api/games/${gameId}/skip`).set(host.auth);
+    expect(res.body.live).toMatchObject({ phase: 'QUESTION', questionNumber: 2, paused: false, timeLeftMs: 60_000 });
+  });
+
+  it('אי אפשר לדלג בחשיפה, בלובי או במשחק של מנחה אחרת', async () => {
+    const { host, gameId } = await setupRunningGame();
+    const other = await hostWithToken();
+    expect((await api().post(`/api/games/${gameId}/skip`).set(other.auth)).status).toBe(404);
+
+    advanceMs(60_000); // הזמן עבר → חשיפה
+    expect((await api().post(`/api/games/${gameId}/skip`).set(host.auth)).status).toBe(409);
+
+    const lobby = await createFullGame(other.auth, { participants: [{ name: 'אחרת', phone: '0500000199' }] });
+    await api().post(`/api/games/${lobby.gameId}/lobby`).set(other.auth);
+    expect((await api().post(`/api/games/${lobby.gameId}/skip`).set(other.auth)).status).toBe(409);
+  });
+});

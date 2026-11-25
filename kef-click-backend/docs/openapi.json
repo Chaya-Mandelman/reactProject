@@ -3855,6 +3855,113 @@
         }
       }
     },
+    "/api/games/{id}/skip": {
+      "post": {
+        "tags": [
+          "הרצת משחק"
+        ],
+        "summary": "דילוג על השאלה",
+        "description": "רק כשהשאלה פתוחה (גם במשחק מושהה). השאלה מתבטלת: התשובות שנקלטו נמחקות והנקודות שלהן יורדות, ועוברים מיד לשאלה הבאה. אחרי השאלה האחרונה — סיום עם סיכום.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "מזהה המשחק",
+            "schema": {
+              "type": "integer",
+              "example": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "הצלחה — מוחזר המצב החי המעודכן",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "live": {
+                      "$ref": "#/components/schemas/LiveState"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "חסר Token או Token לא תקין / פג תוקף",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": {
+                    "code": "UNAUTHORIZED",
+                    "message": "חסר Token. יש לשלוח Authorization: Bearer <token>"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "אין הרשאה לפעולה (תפקיד לא מתאים או חשבון חסום)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": {
+                    "code": "FORBIDDEN",
+                    "message": "אין לך הרשאה לפעולה זו"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "לא נמצא (או שייך למשתמש אחר)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": {
+                    "code": "NOT_FOUND",
+                    "message": "המשחק לא נמצא"
+                  }
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "התנגשות — הפעולה לא מתאימה למצב הנוכחי",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": {
+                    "code": "CONFLICT",
+                    "message": "אי אפשר לערוך משחק בזמן לובי או משחק פעיל. יש לסיים אותו קודם (stop)"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/games/{id}/next": {
       "post": {
         "tags": [

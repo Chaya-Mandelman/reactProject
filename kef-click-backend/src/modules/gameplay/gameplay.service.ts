@@ -119,6 +119,40 @@ export async function nextQuestion(gameId: number) {
   });
 }
 
+/**
+ * דילוג על השאלה הפתוחה: השאלה מתבטלת — התשובות שכבר נקלטו נמחקות והנקודות שלהן יורדות —
+ * ועוברים מיד לשאלה הבאה (או לסיום אחרי האחרונה). עובד גם במשחק מושהה, והשאלה הבאה נפתחת רצה.
+ */
+export async function skipQuestion(gameId: number) {
+  const now = new Date();
+  return withLockedGame(gameId, async (tx, locked) => {
+    if (locked.status !== 'RUNNING' && locked.status !== 'PAUSED') throw HttpError.conflict('אפשר לדלג רק במשחק פעיל');
+    const game = locked.status === 'RUNNING' ? await advance(tx, locked, now) : locked;
+    if (game.phase !== 'QUESTION' || game.currentQuestionIndex === null) {
+      throw HttpError.conflict('אפשר לדלג רק כשהשאלה פתוחה. אחרי החשיפה עוברים לשאלה הבאה');
+    }
+    const questionIds = await orderedQuestionIds(tx, gameId);
+    const questionId = questionIds[game.currentQuestionIndex];
+
+    if (questionId !== undefined) {
+      const scored = await tx.answer.findMany({ where: { questionId, points: { gt: 0 } }, select: { participantId: true, points: true } });
+      for (const a of scored) {
+        await tx.participant.update({ where: { id: a.participantId }, data: { score: { decrement: a.points } } });
+      }
+      await tx.answer.deleteMany({ where: { questionId } });
+    }
+
+    const next = game.currentQuestionIndex + 1;
+    await tx.game.update({
+      where: { id: gameId },
+      data:
+        next < questionIds.length
+          ? { status: 'RUNNING', phase: 'QUESTION', phaseStartedAt: now, currentQuestionIndex: next, pausedElapsedMs: null }
+          : { status: 'FINISHED', finishedAt: now, phase: null, phaseStartedAt: null, currentQuestionIndex: null, pausedElapsedMs: null },
+    });
+  });
+}
+
 /** עצירה: מהלובי — חזרה להכנה. ממשחק רץ/מושהה — סיום מיידי עם סיכום */
 export async function stopGame(gameId: number) {
   const now = new Date();

@@ -41,5 +41,6 @@ gamesRouter.post('/:id/start', hostOnly, asyncHandler(play.start));
 gamesRouter.post('/:id/pause', hostOnly, asyncHandler(play.pause));
 gamesRouter.post('/:id/resume', hostOnly, asyncHandler(play.resume));
 gamesRouter.post('/:id/next', hostOnly, asyncHandler(play.next));
+gamesRouter.post('/:id/skip', hostOnly, asyncHandler(play.skip));
 gamesRouter.post('/:id/stop', hostOnly, asyncHandler(play.stop));
 gamesRouter.get('/:id/live', hostOnly, asyncHandler(play.live));

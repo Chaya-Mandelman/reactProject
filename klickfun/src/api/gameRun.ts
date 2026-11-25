@@ -19,3 +19,5 @@ export const pauseGameApi = liveAction("pause")
 export const resumeGameApi = liveAction("resume")
 export const nextQuestionApi = liveAction("next")
 export const stopGameApi = liveAction("stop")
+// מבטל את השאלה הפתוחה (התשובות והנקודות שלה נמחקות) ועובר לשאלה הבאה
+export const skipQuestionApi = liveAction("skip")
