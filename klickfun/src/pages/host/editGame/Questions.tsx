@@ -14,7 +14,7 @@ export function Questions({ game, locked }: { game: GameDetails; locked: boolean
   const [imageError, setImageError] = useState<string | null>(null)
 
   return (
-    <section className="card mt-6">
+    <section className="card">
       <h2 className="section-title">שאלות ({game.questions.length})</h2>
       {!locked && (
         // כשאחד הכפתורים נפתח, הטופס שלו תופס שורה שלמה
