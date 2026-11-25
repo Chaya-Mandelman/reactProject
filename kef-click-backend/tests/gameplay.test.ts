@@ -121,7 +121,7 @@ describe('משחק מלא — ניקוד, מהירות, חשיפה, השהיה �
     expect(state.phase).toBe('QUESTION');
     expect(state.questionNumber).toBe(1);
     expect(state.totalQuestions).toBe(2);
-    expect(state.timeLeftMs).toBe(60_000);
+    expect(state.timeLeftMs).toBe(30_000);
     expect(state.question.correctOption).toBeUndefined(); // התשובה הנכונה מוסתרת בזמן שאלה
     expect(state.question.options).toHaveLength(4);
 
@@ -135,7 +135,7 @@ describe('משחק מלא — ניקוד, מהירות, חשיפה, השהיה �
     expect(state.answeredCount).toBe(1);
     expect(state.recentAnswers.map((a: { name: string }) => a.name)).toEqual(['שירה']);
     expect(state.fastest).toEqual([{ participantId: expect.any(Number), name: 'שירה', responseMs: 3_400 }]);
-    expect(state.timeLeftMs).toBe(56_600);
+    expect(state.timeLeftMs).toBe(26_600);
     const afterId = state.lastAnswerId;
 
     // תשובה שנייה לאותה שאלה לא נספרת
@@ -172,7 +172,7 @@ describe('משחק מלא — ניקוד, מהירות, חשיפה, השהיה �
     state = await live(gameId, host.auth);
     expect(state.phase).toBe('QUESTION');
     expect(state.questionNumber).toBe(2);
-    expect(state.timeLeftMs).toBe(60_000);
+    expect(state.timeLeftMs).toBe(30_000);
     expect(state.isLastQuestion).toBe(true);
 
     // ===== השהיה: הטיימר נעצר ותשובות לא נקלטות =====
@@ -181,7 +181,7 @@ describe('משחק מלא — ניקוד, מהירות, חשיפה, השהיה �
     advanceMs(30_000);
     state = await live(gameId, host.auth);
     expect(state.paused).toBe(true);
-    expect(state.timeLeftMs).toBe(50_000);
+    expect(state.timeLeftMs).toBe(20_000);
     res = await phone(SHIRA, '3');
     expect(res.text).toContain('מושהה');
     expect(state.answeredCount).toBe(0);
@@ -192,11 +192,11 @@ describe('משחק מלא — ניקוד, מהירות, חשיפה, השהיה �
     res = await phone(SHIRA, '3'); // 12 שניות נטו → 1000 - 120 = 880
     expect(res.text).toContain('880');
     state = await live(gameId, host.auth);
-    expect(state.timeLeftMs).toBe(48_000);
+    expect(state.timeLeftMs).toBe(18_000);
     expect(state.paused).toBe(false);
 
-    // נועה לא עונה — אחרי 60 שניות השאלה נסגרת
-    advanceMs(48_000);
+    // נועה לא עונה — אחרי 30 שניות השאלה נסגרת
+    advanceMs(18_000);
     state = await live(gameId, host.auth);
     expect(state.phase).toBe('REVEAL');
 
@@ -222,19 +222,19 @@ describe('משחק מלא — ניקוד, מהירות, חשיפה, השהיה �
     expect(await prisma.question.count({ where: { gameId } })).toBe(2);
   });
 
-  it('טבלת הניקוד לפי השניות: כל שנייה מורידה 10, שנייה 59 = 410', async () => {
+  it('טבלת הניקוד לפי השניות: כל שנייה מורידה 10, שנייה 29 = 710', async () => {
     const { host, gameId } = await setupRunningGame([competitive('שאלה', 1)]);
     advanceMs(999);
     expect((await phone(SHIRA, '1')).text).toContain('1000 נקודות');
-    advanceMs(59_999 - 999);
-    expect((await phone(NOA, '1')).text).toContain('410 נקודות');
+    advanceMs(29_999 - 999);
+    expect((await phone(NOA, '1')).text).toContain('710 נקודות');
     const state = await live(gameId, host.auth);
     expect(state.phase).toBe('REVEAL');
   });
 
-  it('תשובה בדיוק אחרי 60 שניות נדחית', async () => {
+  it('תשובה בדיוק אחרי 30 שניות נדחית', async () => {
     const { gameId, host } = await setupRunningGame([competitive('שאלה', 1)]);
-    advanceMs(60_000);
+    advanceMs(30_000);
     expect((await phone(SHIRA, '1')).text).toContain('הזמן לשאלה הזו הסתיים');
     const state = await live(gameId, host.auth);
     expect(state.phase).toBe('REVEAL');
@@ -292,7 +292,7 @@ describe('משחק מלא — ניקוד, מהירות, חשיפה, השהיה �
     state = await live(gameId, host.auth);
     expect(state.phase).toBe('QUESTION');
     expect(state.questionNumber).toBe(2);
-    expect(state.timeLeftMs).toBe(60_000);
+    expect(state.timeLeftMs).toBe(30_000);
   });
 
   it('עצירה באמצע — סיום מיידי עם סיכום', async () => {
@@ -345,7 +345,7 @@ describe('דילוג על שאלה', () => {
     advanceMs(5_000);
     const res = await api().post(`/api/games/${gameId}/skip`).set(host.auth);
     expect(res.status).toBe(200);
-    expect(res.body.live).toMatchObject({ phase: 'QUESTION', questionNumber: 3, timeLeftMs: 60_000, answeredCount: 0 });
+    expect(res.body.live).toMatchObject({ phase: 'QUESTION', questionNumber: 3, timeLeftMs: 30_000, answeredCount: 0 });
 
     expect(await prisma.answer.count({ where: { questionId: questionIds[1] } })).toBe(0);
     const shira = await prisma.participant.findFirstOrThrow({ where: { gameId, phone: SHIRA } });
@@ -367,7 +367,7 @@ describe('דילוג על שאלה', () => {
     const { host, gameId } = await setupRunningGame();
     await api().post(`/api/games/${gameId}/pause`).set(host.auth);
     const res = await api().post(`/api/games/${gameId}/skip`).set(host.auth);
-    expect(res.body.live).toMatchObject({ phase: 'QUESTION', questionNumber: 2, paused: false, timeLeftMs: 60_000 });
+    expect(res.body.live).toMatchObject({ phase: 'QUESTION', questionNumber: 2, paused: false, timeLeftMs: 30_000 });
   });
 
   it('אי אפשר לדלג בחשיפה, בלובי או במשחק של מנחה אחרת', async () => {
@@ -375,7 +375,7 @@ describe('דילוג על שאלה', () => {
     const other = await hostWithToken();
     expect((await api().post(`/api/games/${gameId}/skip`).set(other.auth)).status).toBe(404);
 
-    advanceMs(60_000); // הזמן עבר → חשיפה
+    advanceMs(30_000); // הזמן עבר → חשיפה
     expect((await api().post(`/api/games/${gameId}/skip`).set(host.auth)).status).toBe(409);
 
     const lobby = await createFullGame(other.auth, { participants: [{ name: 'אחרת', phone: '0500000199' }] });

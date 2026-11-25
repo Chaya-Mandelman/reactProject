@@ -1,7 +1,7 @@
 /** קבועי המשחק — כל הכללים שסוכמו באפיון במקום אחד */
 export const GAME_RULES = {
   /** זמן מענה לכל שאלה */
-  QUESTION_TIME_MS: 60_000,
+  QUESTION_TIME_MS: 30_000,
   /** ניקוד מקסימלי לתשובה נכונה (מתחת לשנייה) */
   MAX_POINTS: 1000,
   /** כמה נקודות יורדות בכל שנייה שלמה */
@@ -16,7 +16,7 @@ export const GAME_RULES = {
 
 /**
  * חישוב ניקוד לתשובה נכונה: כל שנייה שלמה מורידה 10 נקודות.
- * 0–0.999 שניות = 1000, שנייה 1 = 990, ... שנייה 59 = 410.
+ * 0–0.999 שניות = 1000, שנייה 1 = 990, ... שנייה 29 = 710.
  */
 export function pointsForCorrect(responseMs: number): number {
   const seconds = Math.floor(Math.max(0, responseMs) / 1000);

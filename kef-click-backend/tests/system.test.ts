@@ -109,8 +109,8 @@ describe('כללים ופורמטים', () => {
     expect(pointsForCorrect(999)).toBe(1000);
     expect(pointsForCorrect(1000)).toBe(990);
     expect(pointsForCorrect(3700)).toBe(970);
-    expect(pointsForCorrect(30_000)).toBe(700);
-    expect(pointsForCorrect(59_999)).toBe(410);
+    expect(pointsForCorrect(20_000)).toBe(800);
+    expect(pointsForCorrect(29_999)).toBe(710);
   });
 
   it('נרמול טלפונים', () => {

@@ -54,7 +54,7 @@ export async function allConnectedAnswered(tx: Tx, gameId: number, questionId: n
 
 /**
  * מקדם את המשחק לפי השעון:
- *   שאלה → (60 שניות או שכולם ענו) → חשיפה.
+ *   שאלה → (30 שניות או שכולם ענו) → חשיפה.
  * מהחשיפה ממשיכים רק כשהמנחה לוחצת "לשאלה הבאה" (nextQuestion).
  * מחזיר את המשחק המעודכן. עובד רק כשהסטטוס RUNNING.
  */
