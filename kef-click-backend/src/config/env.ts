@@ -15,7 +15,7 @@ const envSchema = z.object({
   YEMOT_SECRET: z.string().min(8, 'YEMOT_SECRET חייב להיות לפחות 8 תווים'),
   // AI (לא חובה): בלי מפתח, כפתורי ה-AI פשוט לא מופיעים
   OPENAI_API_KEY: z.string().trim().optional(),
-  OPENAI_MODEL: z.string().trim().min(1).default('gpt-5.5'),
+  OPENAI_MODEL: z.string().trim().min(1).default('gpt-5-nano'),
 });
 
 const parsed = envSchema.safeParse(process.env);

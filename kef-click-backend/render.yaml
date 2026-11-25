@@ -28,4 +28,4 @@ services:
       - key: OPENAI_API_KEY
         sync: false # מפתח של OpenAI ל-AI (לא חובה — בלי מפתח הכפתורים לא מופיעים)
       - key: OPENAI_MODEL
-        value: gpt-5.5
+        value: gpt-5-nano
