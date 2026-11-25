@@ -23,12 +23,14 @@ gamesRouter.delete('/:id', asyncHandler(ctrl.remove));
 gamesRouter.post('/:id/duplicate', hostOnly, asyncHandler(ctrl.duplicate));
 
 // משתתפים
+gamesRouter.post('/:id/participants/bulk', hostOnly, asyncHandler(ctrl.addParticipantsBulk));
 gamesRouter.post('/:id/participants', hostOnly, asyncHandler(ctrl.addParticipant));
 gamesRouter.patch('/:id/participants/:pid', hostOnly, asyncHandler(ctrl.updateParticipant));
 gamesRouter.delete('/:id/participants/:pid', hostOnly, asyncHandler(ctrl.deleteParticipant));
 
 // שאלות (שים לב: order לפני :qid)
 gamesRouter.put('/:id/questions/order', hostOnly, asyncHandler(ctrl.reorderQuestions));
+gamesRouter.post('/:id/questions/bulk', hostOnly, asyncHandler(ctrl.addQuestionsBulk));
 gamesRouter.post('/:id/questions', hostOnly, asyncHandler(ctrl.addQuestion));
 gamesRouter.patch('/:id/questions/:qid', hostOnly, asyncHandler(ctrl.updateQuestion));
 gamesRouter.delete('/:id/questions/:qid', hostOnly, asyncHandler(ctrl.deleteQuestion));

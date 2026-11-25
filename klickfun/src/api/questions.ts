@@ -7,6 +7,12 @@ export const addQuestionApi = async ({ gameId, details }: { gameId: number; deta
   return response.data.question
 }
 
+// הוספת הרבה שאלות בבת אחת: או שכולן נשמרות או אף אחת
+export const addQuestionsBulkApi = async ({ gameId, questions }: { gameId: number; questions: QuestionInput[] }): Promise<Question[]> => {
+  const response = await api.post<{ questions: Question[] }>(`/games/${gameId}/questions/bulk`, { questions })
+  return response.data.questions
+}
+
 export const updateQuestionApi = async ({ gameId, id, details }: GameItemRef & { details: QuestionInput }): Promise<Question> => {
   const response = await api.patch<{ question: Question }>(`/games/${gameId}/questions/${id}`, details)
   return response.data.question

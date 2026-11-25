@@ -2195,6 +2195,161 @@
         }
       }
     },
+    "/api/games/{id}/participants/bulk": {
+      "post": {
+        "tags": [
+          "משתתפים"
+        ],
+        "summary": "הוספת הרבה משתתפים בבת אחת",
+        "description": "עד 200. או שכולם נשמרים או אף אחד. טלפון כפול (ברשימה או מול הרשומים) מחזיר 409 עם פירוט לכל שורה (participants.N.phone).",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "מזהה המשחק",
+            "schema": {
+              "type": "integer",
+              "example": 1
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "participants"
+                ],
+                "properties": {
+                  "participants": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/ParticipantInput"
+                    },
+                    "minItems": 1,
+                    "maxItems": 200
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "נוספו",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "participants": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Participant"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "קלט לא תקין",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": {
+                    "code": "BAD_REQUEST",
+                    "message": "הנתונים שנשלחו אינם תקינים",
+                    "details": [
+                      {
+                        "field": "title",
+                        "message": "שם המשחק קצר מדי"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "חסר Token או Token לא תקין / פג תוקף",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": {
+                    "code": "UNAUTHORIZED",
+                    "message": "חסר Token. יש לשלוח Authorization: Bearer <token>"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "אין הרשאה לפעולה (תפקיד לא מתאים או חשבון חסום)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": {
+                    "code": "FORBIDDEN",
+                    "message": "אין לך הרשאה לפעולה זו"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "לא נמצא (או שייך למשתמש אחר)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": {
+                    "code": "NOT_FOUND",
+                    "message": "המשחק לא נמצא"
+                  }
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "התנגשות — הפעולה לא מתאימה למצב הנוכחי",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": {
+                    "code": "CONFLICT",
+                    "message": "אי אפשר לערוך משחק בזמן לובי או משחק פעיל. יש לסיים אותו קודם (stop)"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/games/{id}/participants": {
       "post": {
         "tags": [
@@ -2515,6 +2670,161 @@
         "responses": {
           "204": {
             "description": "נמחק"
+          },
+          "401": {
+            "description": "חסר Token או Token לא תקין / פג תוקף",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": {
+                    "code": "UNAUTHORIZED",
+                    "message": "חסר Token. יש לשלוח Authorization: Bearer <token>"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "אין הרשאה לפעולה (תפקיד לא מתאים או חשבון חסום)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": {
+                    "code": "FORBIDDEN",
+                    "message": "אין לך הרשאה לפעולה זו"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "לא נמצא (או שייך למשתמש אחר)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": {
+                    "code": "NOT_FOUND",
+                    "message": "המשחק לא נמצא"
+                  }
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "התנגשות — הפעולה לא מתאימה למצב הנוכחי",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": {
+                    "code": "CONFLICT",
+                    "message": "אי אפשר לערוך משחק בזמן לובי או משחק פעיל. יש לסיים אותו קודם (stop)"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/games/{id}/questions/bulk": {
+      "post": {
+        "tags": [
+          "שאלות"
+        ],
+        "summary": "הוספת הרבה שאלות בבת אחת",
+        "description": "עד 50, בסוף הרשימה. או שכולן נשמרות או אף אחת. שגיאות מפורטות לכל שאלה (questions.N.field).",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "מזהה המשחק",
+            "schema": {
+              "type": "integer",
+              "example": 1
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "questions"
+                ],
+                "properties": {
+                  "questions": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/QuestionInput"
+                    },
+                    "minItems": 1,
+                    "maxItems": 50
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "נוספו",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "questions": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Question"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "קלט לא תקין",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": {
+                    "code": "BAD_REQUEST",
+                    "message": "הנתונים שנשלחו אינם תקינים",
+                    "details": [
+                      {
+                        "field": "title",
+                        "message": "שם המשחק קצר מדי"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
           },
           "401": {
             "description": "חסר Token או Token לא תקין / פג תוקף",

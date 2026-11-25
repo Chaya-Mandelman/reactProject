@@ -2,6 +2,8 @@ import type { Request, Response } from 'express';
 import { currentUser } from '../../middleware/auth';
 import { parse } from '../../middleware/validate';
 import {
+  bulkParticipantsSchema,
+  bulkQuestionsSchema,
   createGameSchema,
   createParticipantSchema,
   createQuestionSchema,
@@ -61,6 +63,12 @@ export async function addParticipant(req: Request, res: Response) {
   res.status(201).json({ participant: await service.addParticipant(game, input) });
 }
 
+export async function addParticipantsBulk(req: Request, res: Response) {
+  const { game } = await loadGame(req, 'write');
+  const { participants } = parse(bulkParticipantsSchema, req.body);
+  res.status(201).json({ participants: await service.addParticipantsBulk(game, participants) });
+}
+
 export async function updateParticipant(req: Request, res: Response) {
   const { game } = await loadGame(req, 'write');
   const pid = parse(idParam, req.params.pid);
@@ -79,6 +87,12 @@ export async function addQuestion(req: Request, res: Response) {
   const { game } = await loadGame(req, 'write');
   const input = parse(createQuestionSchema, req.body);
   res.status(201).json({ question: await service.addQuestion(game, input) });
+}
+
+export async function addQuestionsBulk(req: Request, res: Response) {
+  const { game } = await loadGame(req, 'write');
+  const { questions } = parse(bulkQuestionsSchema, req.body);
+  res.status(201).json({ questions: await service.addQuestionsBulk(game, questions) });
 }
 
 export async function updateQuestion(req: Request, res: Response) {

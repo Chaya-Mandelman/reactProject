@@ -12,6 +12,7 @@ import type {
   UpdateQuestionInput,
 } from './games.schemas';
 import { fullQuestionSchema } from './games.schemas';
+import type { z } from 'zod';
 import { parse } from '../../middleware/validate';
 
 /** סטטוסים שבהם המשחק "פעיל" — הטלפונים של המשתתפים תפוסים */
@@ -200,6 +201,28 @@ export async function addParticipant(game: Game, input: CreateParticipantInput) 
   return serializeParticipant(p);
 }
 
+/**
+ * הוספת הרבה משתתפים בבת אחת: או שכולם נשמרים או אף אחד.
+ * טלפון כפול (בתוך הרשימה או מול מי שכבר רשום) — שגיאה עם פירוט לכל שורה.
+ */
+export async function addParticipantsBulk(game: Game, inputs: CreateParticipantInput[]) {
+  assertEditable(game);
+  const existing = await prisma.participant.findMany({ where: { gameId: game.id }, select: { name: true, phone: true } });
+  const taken = new Map(existing.map((p) => [p.phone, p.name]));
+  const problems: { field: string; message: string }[] = [];
+  inputs.forEach((p, i) => {
+    const owner = taken.get(p.phone);
+    if (owner !== undefined) problems.push({ field: `participants.${i}.phone`, message: `הטלפון ${p.phone} כבר רשום במשחק (${owner})` });
+    else taken.set(p.phone, p.name);
+  });
+  if (problems.length > 0) throw HttpError.conflict('יש טלפונים כפולים ברשימה', problems);
+
+  const created = await prisma.$transaction(
+    inputs.map((p) => prisma.participant.create({ data: { gameId: game.id, name: p.name, phone: p.phone } })),
+  );
+  return created.map(serializeParticipant);
+}
+
 export async function updateParticipant(game: Game, participantId: number, input: UpdateParticipantInput) {
   assertEditable(game);
   const p = await prisma.participant.findFirst({ where: { id: participantId, gameId: game.id } });
@@ -233,6 +256,29 @@ export async function addQuestion(game: Game, input: CreateQuestionInput) {
     data: { ...data, gameId: game.id, order: (last._max.order ?? 0) + 1 },
   });
   return serializeQuestion(q);
+}
+
+/** הוספת הרבה שאלות בבת אחת, בסוף הרשימה: או שכולן נשמרות או אף אחת */
+export async function addQuestionsBulk(game: Game, inputs: CreateQuestionInput[]) {
+  assertEditable(game);
+  const problems: { field: string; message: string }[] = [];
+  const valid: z.infer<typeof fullQuestionSchema>[] = [];
+  inputs.forEach((input, i) => {
+    const result = fullQuestionSchema.safeParse({ ...input, correctOption: input.correctOption ?? null });
+    if (result.success) valid.push(result.data);
+    else for (const issue of result.error.issues) problems.push({ field: `questions.${i}.${issue.path.join('.')}`, message: issue.message });
+  });
+  if (problems.length > 0) throw HttpError.badRequest('חלק מהשאלות אינן תקינות', problems);
+
+  return prisma.$transaction(async (tx) => {
+    const last = await tx.question.aggregate({ where: { gameId: game.id }, _max: { order: true } });
+    const start = (last._max.order ?? 0) + 1;
+    const created = [];
+    for (const [i, data] of valid.entries()) {
+      created.push(await tx.question.create({ data: { ...data, gameId: game.id, order: start + i } }));
+    }
+    return created.map(serializeQuestion);
+  });
 }
 
 export async function updateQuestion(game: Game, questionId: number, input: UpdateQuestionInput) {

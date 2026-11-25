@@ -108,6 +108,24 @@ export const reorderQuestionsSchema = z.object({
   questionIds: z.array(z.number().int().positive(), { required_error: 'questionIds חובה' }).min(1, 'רשימה ריקה'),
 });
 
+// ===== הוספה של הרבה בבת אחת (למשל מה-AI) =====
+export const MAX_BULK_QUESTIONS = 50;
+export const MAX_BULK_PARTICIPANTS = 200;
+
+export const bulkQuestionsSchema = z.object({
+  questions: z
+    .array(createQuestionSchema, { required_error: 'questions חובה' })
+    .min(1, 'רשימה ריקה')
+    .max(MAX_BULK_QUESTIONS, `אפשר להוסיף עד ${MAX_BULK_QUESTIONS} שאלות בבת אחת`),
+});
+
+export const bulkParticipantsSchema = z.object({
+  participants: z
+    .array(createParticipantSchema, { required_error: 'participants חובה' })
+    .min(1, 'רשימה ריקה')
+    .max(MAX_BULK_PARTICIPANTS, `אפשר להוסיף עד ${MAX_BULK_PARTICIPANTS} משתתפים בבת אחת`),
+});
+
 export type CreateGameInput = z.infer<typeof createGameSchema>;
 export type UpdateGameInput = z.infer<typeof updateGameSchema>;
 export type CreateParticipantInput = z.infer<typeof createParticipantSchema>;

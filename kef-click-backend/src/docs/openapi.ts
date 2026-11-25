@@ -445,6 +445,17 @@ export const openApiSpec = {
         responses: { 201: { description: 'העותק', content: json({ type: 'object', properties: { game: ref('GameDetails') } }) }, ...pick(401, 403, 404) },
       },
     },
+    '/api/games/{id}/participants/bulk': {
+      post: {
+        tags: ['משתתפים'],
+        summary: 'הוספת הרבה משתתפים בבת אחת',
+        description: 'עד 200. או שכולם נשמרים או אף אחד. טלפון כפול (ברשימה או מול הרשומים) מחזיר 409 עם פירוט לכל שורה (participants.N.phone).',
+        security: bearer,
+        parameters: [gameId],
+        requestBody: { required: true, content: json({ type: 'object', required: ['participants'], properties: { participants: { type: 'array', items: ref('ParticipantInput'), minItems: 1, maxItems: 200 } } }) },
+        responses: { 201: { description: 'נוספו', content: json({ type: 'object', properties: { participants: { type: 'array', items: ref('Participant') } } }) }, ...pick(400, 401, 403, 404, 409) },
+      },
+    },
     '/api/games/{id}/participants': {
       post: {
         tags: ['משתתפים'],
@@ -470,6 +481,17 @@ export const openApiSpec = {
         security: bearer,
         parameters: [gameId, pid],
         responses: { 204: { description: 'נמחק' }, ...pick(401, 403, 404, 409) },
+      },
+    },
+    '/api/games/{id}/questions/bulk': {
+      post: {
+        tags: ['שאלות'],
+        summary: 'הוספת הרבה שאלות בבת אחת',
+        description: 'עד 50, בסוף הרשימה. או שכולן נשמרות או אף אחת. שגיאות מפורטות לכל שאלה (questions.N.field).',
+        security: bearer,
+        parameters: [gameId],
+        requestBody: { required: true, content: json({ type: 'object', required: ['questions'], properties: { questions: { type: 'array', items: ref('QuestionInput'), minItems: 1, maxItems: 50 } } }) },
+        responses: { 201: { description: 'נוספו', content: json({ type: 'object', properties: { questions: { type: 'array', items: ref('Question') } } }) }, ...pick(400, 401, 403, 404, 409) },
       },
     },
     '/api/games/{id}/questions': {
