@@ -2965,6 +2965,164 @@
         }
       }
     },
+    "/api/games/{id}/ai/participants": {
+      "post": {
+        "tags": [
+          "AI"
+        ],
+        "summary": "הדבקה חכמה של משתתפים",
+        "description": "מוציא שמות וטלפונים מטקסט חופשי (אקסל, וואטסאפ, רשימה). לא שומר כלום. הטקסט נשלח ל-OpenAI. כל טלפון מנורמל ונבדק; שורה בעייתית מקבלת error (טלפון חסר, לא תקין או כפול). את השורות התקינות שומרים דרך participants/bulk.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "מזהה המשחק",
+            "schema": {
+              "type": "integer",
+              "example": 1
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "text"
+                ],
+                "properties": {
+                  "text": {
+                    "type": "string",
+                    "minLength": 3,
+                    "maxLength": 20000,
+                    "example": "שירה כהן 050-1234567, נועה לוי 0527654321"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "שורות",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "participants": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "name": {
+                            "type": "string"
+                          },
+                          "phone": {
+                            "type": "string"
+                          },
+                          "error": {
+                            "type": "string",
+                            "nullable": true
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "קלט לא תקין",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": {
+                    "code": "BAD_REQUEST",
+                    "message": "הנתונים שנשלחו אינם תקינים",
+                    "details": [
+                      {
+                        "field": "title",
+                        "message": "שם המשחק קצר מדי"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "חסר Token או Token לא תקין / פג תוקף",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": {
+                    "code": "UNAUTHORIZED",
+                    "message": "חסר Token. יש לשלוח Authorization: Bearer <token>"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "אין הרשאה לפעולה (תפקיד לא מתאים או חשבון חסום)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": {
+                    "code": "FORBIDDEN",
+                    "message": "אין לך הרשאה לפעולה זו"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "לא נמצא (או שייך למשתמש אחר)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": {
+                    "code": "NOT_FOUND",
+                    "message": "המשחק לא נמצא"
+                  }
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "יותר מדי בקשות, או שה-AI עמוס"
+          },
+          "502": {
+            "description": "שגיאה מה-AI"
+          },
+          "503": {
+            "description": "ה-AI לא מוגדר בשרת"
+          }
+        }
+      }
+    },
     "/api/games/{id}/questions/bulk": {
       "post": {
         "tags": [

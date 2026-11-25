@@ -78,3 +78,50 @@ describe('AI — יצירת שאלות', () => {
     expect(spy).not.toHaveBeenCalled();
   });
 });
+
+describe('AI — הדבקה חכמה של משתתפים', () => {
+  it('מנרמל טלפונים ומסמן שורות בעייתיות, בלי לשמור', async () => {
+    const host = await hostWithToken();
+    const { gameId } = await createFullGame(host.auth); // 0500000101 (שירה) כבר רשומה
+    const spy = mockAi({
+      participants: [
+        { name: 'רות כהן', phone: '050-000-0201' },
+        { name: 'מיכל', phone: '+972 50 000 0202' },
+        { name: 'בלי טלפון', phone: '' },
+        { name: 'טלפון שבור', phone: '123' },
+        { name: 'שירה שוב', phone: '0500000101' },
+        { name: 'רות פעמיים', phone: '0500000201' },
+        { name: '', phone: '' },
+      ],
+    });
+    const text = 'רות כהן 050-000-0201\nמיכל +972 50 000 0202';
+    const res = await api().post(`/api/games/${gameId}/ai/participants`).set(host.auth).send({ text });
+    expect(res.status).toBe(200);
+    expect(res.body.participants).toEqual([
+      { name: 'רות כהן', phone: '0500000201', error: null },
+      { name: 'מיכל', phone: '0500000202', error: null },
+      { name: 'בלי טלפון', phone: '', error: 'חסר טלפון' },
+      { name: 'טלפון שבור', phone: '123', error: 'טלפון לא תקין' },
+      { name: 'שירה שוב', phone: '0500000101', error: 'הטלפון כבר ברשימה (שירה)' },
+      { name: 'רות פעמיים', phone: '0500000201', error: 'הטלפון כבר ברשימה (רות כהן)' },
+    ]);
+    expect(spy.mock.calls[0]![0].input).toBe(text);
+    expect(await prisma.participant.count({ where: { gameId } })).toBe(2);
+
+    // השורות התקינות נשמרות דרך הוספה מרובה
+    const ok = res.body.participants.filter((p: { error: string | null }) => p.error === null).map(({ name, phone }: { name: string; phone: string }) => ({ name, phone }));
+    expect((await api().post(`/api/games/${gameId}/participants/bulk`).set(host.auth).send({ participants: ok })).status).toBe(201);
+  });
+
+  it('ולידציה והרשאות', async () => {
+    const host = await hostWithToken();
+    const other = await hostWithToken();
+    const { gameId } = await createFullGame(host.auth);
+    const spy = mockAi({ participants: [] });
+    const url = `/api/games/${gameId}/ai/participants`;
+    expect((await api().post(url).set(host.auth).send({ text: '' })).status).toBe(400);
+    expect((await api().post(url).set(host.auth).send({ text: 'א'.repeat(20_001) })).status).toBe(400);
+    expect((await api().post(url).set(other.auth).send({ text: 'רות 0500000201' })).status).toBe(404);
+    expect(spy).not.toHaveBeenCalled();
+  });
+});

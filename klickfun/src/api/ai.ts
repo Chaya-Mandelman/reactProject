@@ -29,3 +29,16 @@ export const generateQuestionsApi = async ({ gameId, ...body }: GenerateQuestion
   const response = await api.post<GenerateQuestionsResult>(`/games/${gameId}/ai/questions`, body)
   return response.data
 }
+
+// שורה שה-AI הוציא מהטקסט. error = מה לא תקין בשורה (טלפון חסר, לא תקין או כפול)
+export interface ExtractedParticipant {
+  name: string
+  phone: string
+  error: string | null
+}
+
+// הדבקה חכמה: הטקסט נשלח ל-OpenAI, ושום דבר לא נשמר עד שהמנחה שומרת
+export const extractParticipantsApi = async ({ gameId, text }: { gameId: number; text: string }): Promise<ExtractedParticipant[]> => {
+  const response = await api.post<{ participants: ExtractedParticipant[] }>(`/games/${gameId}/ai/participants`, { text })
+  return response.data.participants
+}

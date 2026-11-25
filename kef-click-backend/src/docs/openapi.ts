@@ -522,6 +522,34 @@ export const openApiSpec = {
         },
       },
     },
+    '/api/games/{id}/ai/participants': {
+      post: {
+        tags: ['AI'],
+        summary: 'הדבקה חכמה של משתתפים',
+        description: 'מוציא שמות וטלפונים מטקסט חופשי (אקסל, וואטסאפ, רשימה). לא שומר כלום. הטקסט נשלח ל-OpenAI. כל טלפון מנורמל ונבדק; שורה בעייתית מקבלת error (טלפון חסר, לא תקין או כפול). את השורות התקינות שומרים דרך participants/bulk.',
+        security: bearer,
+        parameters: [gameId],
+        requestBody: { required: true, content: json({ type: 'object', required: ['text'], properties: { text: { type: 'string', minLength: 3, maxLength: 20000, example: 'שירה כהן 050-1234567, נועה לוי 0527654321' } } }) },
+        responses: {
+          200: {
+            description: 'שורות',
+            content: json({
+              type: 'object',
+              properties: {
+                participants: {
+                  type: 'array',
+                  items: { type: 'object', properties: { name: { type: 'string' }, phone: { type: 'string' }, error: { type: 'string', nullable: true } } },
+                },
+              },
+            }),
+          },
+          429: { description: 'יותר מדי בקשות, או שה-AI עמוס' },
+          502: { description: 'שגיאה מה-AI' },
+          503: { description: 'ה-AI לא מוגדר בשרת' },
+          ...pick(400, 401, 403, 404),
+        },
+      },
+    },
     '/api/games/{id}/questions/bulk': {
       post: {
         tags: ['שאלות'],

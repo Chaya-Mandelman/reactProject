@@ -5,7 +5,8 @@ import { parse } from '../../middleware/validate';
 import { asyncHandler } from '../../utils/asyncHandler';
 import { loadGame } from '../games/games.controller';
 import { aiEnabled } from './ai.provider';
-import { generateQuestions, generateQuestionsSchema } from './ai.service';
+import { prisma } from '../../db/prisma';
+import { extractParticipants, extractParticipantsSchema, generateQuestions, generateQuestionsSchema } from './ai.service';
 
 /** הגבלת פניות ל-AI לכל מנחה — כל פנייה עולה כסף בחשבון OpenAI */
 export const aiLimiter = rateLimit({
@@ -23,6 +24,14 @@ export async function generateGameQuestions(req: Request, res: Response) {
   await loadGame(req, 'write');
   const input = parse(generateQuestionsSchema, req.body);
   res.json(await generateQuestions(input));
+}
+
+/** הדבקה חכמה: שמות וטלפונים מתוך טקסט חופשי, עם סימון שורות בעייתיות. לא שומר כלום */
+export async function extractGameParticipants(req: Request, res: Response) {
+  const { game } = await loadGame(req, 'write');
+  const { text } = parse(extractParticipantsSchema, req.body);
+  const existing = await prisma.participant.findMany({ where: { gameId: game.id }, select: { name: true, phone: true } });
+  res.json(await extractParticipants(text, existing));
 }
 
 /** האם ה-AI מוגדר בשרת — כדי שהקליינט יציג או יסתיר את הכפתורים */

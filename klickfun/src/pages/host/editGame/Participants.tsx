@@ -1,6 +1,9 @@
 import { useState } from "react"
 import { useAddParticipant } from "@/hooks/participants/useParticipantMutations"
+import { OpenButton } from "@/components/OpenButton"
+import { useAiEnabled } from "@/hooks/ai/useAiStatus"
 import type { GameDetails } from "@/types/game"
+import { AiParticipants } from "./AiParticipants"
 import { ParticipantForm } from "./ParticipantForm"
 import { ParticipantRow } from "./ParticipantRow"
 
@@ -8,6 +11,7 @@ export function Participants({ game, locked }: { game: GameDetails; locked: bool
   const add = useAddParticipant()
   // שינוי ה-key יוצר טופס חדש וריק אחרי כל הוספה
   const [formKey, setFormKey] = useState(0)
+  const aiEnabled = useAiEnabled()
 
   return (
     <section className="card">
@@ -21,6 +25,13 @@ export function Participants({ game, locked }: { game: GameDetails; locked: bool
             setFormKey((key) => key + 1)
           }}
         />
+      )}
+      {!locked && aiEnabled && (
+        <div className="mt-3">
+          <OpenButton label="✨ הדבקה חכמה של רשימה">
+            {(close) => <AiParticipants gameId={game.id} onClose={close} />}
+          </OpenButton>
+        </div>
       )}
       {game.participants.length === 0 && <p className="empty mt-4">עדיין אין משתתפים</p>}
       <ul className="mt-4 grid gap-2">

@@ -24,6 +24,7 @@ gamesRouter.delete('/:id', asyncHandler(ctrl.remove));
 gamesRouter.post('/:id/duplicate', hostOnly, asyncHandler(ctrl.duplicate));
 
 // משתתפים
+gamesRouter.post('/:id/ai/participants', hostOnly, ai.aiLimiter, asyncHandler(ai.extractGameParticipants));
 gamesRouter.post('/:id/participants/bulk', hostOnly, asyncHandler(ctrl.addParticipantsBulk));
 gamesRouter.post('/:id/participants', hostOnly, asyncHandler(ctrl.addParticipant));
 gamesRouter.patch('/:id/participants/:pid', hostOnly, asyncHandler(ctrl.updateParticipant));
